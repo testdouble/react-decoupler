@@ -94,7 +94,7 @@ export class ServiceLocator {
   }
 }
 
-export const useServices = (...deps) => {
+export const useServices = deps => {
   const locator = useServiceLocator()
   return locator.locate(deps)
 }
