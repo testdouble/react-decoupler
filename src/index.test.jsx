@@ -171,10 +171,9 @@ describe('useServicesLocator()', () => {
 describe('useServices()', () => {
   it('returns requested services', () => {
     const App = () => {
-      const results = useServices(['func', 'ServiceClass', 'val'], 'missing')
-      expect(results).toEqual(
-        pick(mockServices, ['func', 'ServiceClass', 'val'])
-      )
+      const requestedServices = ['func', 'ServiceClass', 'val']
+      const results = useServices(requestedServices, 'missing')
+      expect(results).toEqual(pick(mockServices, requestedServices))
       return 'default'
     }
 
