@@ -5,6 +5,7 @@ _TODO: overview_
 
 ## Installation
 
+_TODO: make real_
 * NPM: `npm install --save react-service-injector`
 * Yarn: `yarn add react-service-injector`
 
@@ -23,6 +24,8 @@ Development of React Service Injector happens in the open on GitHub, and we are
 grateful to the community for contributing bugfixes and improvements. Read below
 to learn how you can take part in improving React Service Injector.
 
+_TODO: contributing help_
+
 ### [Code of Conduct](https://testdouble.com/code-of-conduct)
 
 This project follows Test Double's [code of
@@ -34,4 +37,4 @@ including blocking a user from the organization's repositories.
 
 ### License
 
-React is [MIT licensed](./LICENSE).
+React Service Injector is [MIT licensed](./LICENSE).
