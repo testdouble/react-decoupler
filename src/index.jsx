@@ -37,8 +37,10 @@ export const withServices = Component => {
     static displayName = `withServices(${componentDisplayName})`
     static contextType = LocatorContext
     render() {
-      const staticDeps = Component.dependencies
-      return <Component {...this.props} {...this.context.locate(staticDeps)} />
+      const staticDeps = Component.dependencies || []
+      return (
+        <Component {...this.props} services={this.context.locate(staticDeps)} />
+      )
     }
   }
 
@@ -83,14 +85,13 @@ export class ServiceLocator {
   }
 
   locate(depList) {
-    const depSet = new Set(depList)
-    const results = {}
-    for (let [key, service] of this._deps.entries()) {
-      if (depSet.has(key)) {
-        results[key] = service
+    return depList.map(depKey => {
+      if (!this._deps.has(depKey)) {
+        // TODO: only do this in DEV
+        throw new Error(`No service matching key: ${depKey}`)
       }
-    }
-    return results
+      return this._deps.get(depKey)
+    })
   }
 }
 

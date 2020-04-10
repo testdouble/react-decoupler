@@ -1,6 +1,5 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import pick from 'lodash.pick'
 import {
   LocateServicesProvider,
   withServices,
@@ -34,11 +33,7 @@ describe('ServiceLocator', () => {
     locator.add('staticValue', 123)
     locator.add('A', A)
     locator.add('B', B)
-    expect(locator.locate(['A', 'B', 'staticValue', 'missing'])).toEqual({
-      A,
-      B,
-      staticValue: 123,
-    })
+    expect(locator.locate(['A', 'B', 'staticValue'])).toEqual([A, B, 123])
   })
 
   it('throws when adding duplicate key', () => {
@@ -47,12 +42,23 @@ describe('ServiceLocator', () => {
       locator.add('val', 456)
     }).toThrow()
   })
+
+  it('throws when locating a missing key', () => {
+    locator.add('val', 123)
+    expect(() => {
+      locator.locate(['unknown'])
+    }).toThrow()
+  })
 })
 
 describe('withServices() HOC', () => {
   it('passes declared dependencies as props', () => {
     const App = props => {
-      expect(props.ServiceClass).toBe(mockServices.ServiceClass)
+      expect(props.services).toEqual([
+        mockServices.func,
+        mockServices.ServiceClass,
+        mockServices.val,
+      ])
       return 'done'
     }
     App.dependencies = ['func', 'ServiceClass', 'val']
@@ -105,8 +111,10 @@ describe('<InjectServices /> render prop component', () => {
     const App = props => {
       return (
         <InjectServices deps={['func', 'ServiceClass', 'val']}>
-          {services => {
-            expect(services.ServiceClass).toBe(mockServices.ServiceClass)
+          {([func, ServiceClass, val]) => {
+            expect(func).toBe(mockServices.func)
+            expect(ServiceClass).toBe(mockServices.ServiceClass)
+            expect(val).toBe(mockServices.val)
             return 'done'
           }}
         </InjectServices>
@@ -172,8 +180,13 @@ describe('useServices()', () => {
   it('returns requested services', () => {
     const App = () => {
       const requestedServices = ['func', 'ServiceClass', 'val']
-      const results = useServices(requestedServices, 'missing')
-      expect(results).toEqual(pick(mockServices, requestedServices))
+      const [func, ServiceClass, val] = useServices(
+        requestedServices,
+        'missing'
+      )
+      expect(func).toBe(mockServices.func)
+      expect(ServiceClass).toBe(mockServices.ServiceClass)
+      expect(val).toBe(mockServices.val)
       return 'default'
     }
 
