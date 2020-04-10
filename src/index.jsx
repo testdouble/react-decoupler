@@ -68,6 +68,10 @@ export class ServiceLocator {
     this._deps = new Map()
   }
 
+  get dependencies() {
+    return new Map(this._deps)
+  }
+
   add(key, value) {
     if (this._deps.has(key)) {
       // TODO: only do this in DEV
@@ -76,14 +80,31 @@ export class ServiceLocator {
     this._deps.set(key, value)
   }
 
-  locate(depList) {
-    return depList.map(depKey => {
-      if (!this._deps.has(depKey)) {
-        // TODO: only do this in DEV
-        throw new Error(`No service matching key: ${depKey}`)
-      }
-      return this._deps.get(depKey)
-    })
+  locate(dependencies) {
+    if (Array.isArray(dependencies)) {
+      return dependencies.map(key => {
+        if (!this._deps.has(key)) {
+          // TODO: only do this in DEV
+          throw new Error(`No service matching key: ${key}`)
+        }
+        return this._deps.get(key)
+      })
+    } else if (!!dependencies && typeof dependencies === 'object') {
+      return Object.entries(dependencies).reduce((result, [key, name]) => {
+        if (!this._deps.has(key)) {
+          // TODO: only do this in DEV
+          throw new Error(`No service matching key: ${key}`)
+        }
+        result[name] = this._deps.get(key)
+        return result
+      }, {})
+    } else {
+      throw new Error(
+        `Unsupported dependency list.  Only Arrays and Objects are supported. Got: ${JSON.stringify(
+          dependencies
+        )}`
+      )
+    }
   }
 
   static fromServices(services) {

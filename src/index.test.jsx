@@ -27,13 +27,38 @@ describe('ServiceLocator', () => {
     locator = new ServiceLocator()
   })
 
-  it('adds and looks up multiple', () => {
+  it('adds services to dep map', () => {
+    const expectedMap = new Map()
     class A {}
     class B {}
     locator.add('staticValue', 123)
+    expectedMap.set('staticValue', 123)
     locator.add('A', A)
+    expectedMap.set('A', A)
     locator.add('B', B)
-    expect(locator.locate(['A', 'B', 'staticValue'])).toEqual([A, B, 123])
+    expectedMap.set('B', B)
+
+    expect(locator.dependencies).toEqual(expectedMap)
+  })
+
+  it('returns a list of deps when given a list of keys', () => {
+    class A {}
+    class B {}
+    locator.add('A.super-complex-key', A)
+    locator.add('B', B)
+
+    expect(locator.locate(['A.super-complex-key', 'B'])).toEqual([A, B])
+  })
+
+  it('returns an object of deps keyed by name when given a key->name object', () => {
+    class A {}
+    class B {}
+    locator.add('A', A)
+    locator.add('B.super-complex-key', B)
+
+    expect(
+      locator.locate({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
+    ).toEqual({ SimpleB: B, ComplexA: A })
   })
 
   it('throws when adding duplicate key', () => {
@@ -48,6 +73,32 @@ describe('ServiceLocator', () => {
     expect(() => {
       locator.locate(['unknown'])
     }).toThrow()
+  })
+
+  it('throws when locating with not an array or object', () => {
+    expect(() => {
+      locator.locate(123)
+    }).toThrow()
+
+    expect(() => {
+      locator.locate('unsupported string')
+    }).toThrow()
+
+    expect(() => {
+      locator.locate(null)
+    }).toThrow()
+
+    expect(() => {
+      locator.locate(true)
+    }).toThrow()
+
+    expect(() => {
+      locator.locate([])
+    }).not.toThrow()
+
+    expect(() => {
+      locator.locate({})
+    }).not.toThrow()
   })
 })
 
