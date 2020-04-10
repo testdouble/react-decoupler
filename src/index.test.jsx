@@ -34,7 +34,7 @@ describe('ServiceLocator', () => {
     locator.add('staticValue', 123)
     locator.add('A', A)
     locator.add('B', B)
-    expect(locator.locate('A', 'B', 'staticValue', 'missing')).toEqual({
+    expect(locator.locate(['A', 'B', 'staticValue', 'missing'])).toEqual({
       A,
       B,
       staticValue: 123,

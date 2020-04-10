@@ -38,9 +38,7 @@ export const withServices = Component => {
     static contextType = LocatorContext
     render() {
       const staticDeps = Component.dependencies
-      return (
-        <Component {...this.props} {...this.context.locate(...staticDeps)} />
-      )
+      return <Component {...this.props} {...this.context.locate(staticDeps)} />
     }
   }
 
@@ -57,7 +55,7 @@ export const useServiceLocator = () => {
 
 export const InjectServices = ({ deps, children }) => {
   const locator = useServiceLocator()
-  return children(locator.locate(...deps))
+  return children(locator.locate(deps))
 }
 InjectServices.propTypes = {
   children: PropTypes.func.isRequired,
@@ -84,7 +82,7 @@ export class ServiceLocator {
     this._deps.set(key, value)
   }
 
-  locate(...depList) {
+  locate(depList) {
     const depSet = new Set(depList)
     const results = {}
     for (let [key, service] of this._deps.entries()) {
@@ -98,5 +96,5 @@ export class ServiceLocator {
 
 export const useServices = (...deps) => {
   const locator = useServiceLocator()
-  return locator.locate(...deps)
+  return locator.locate(deps)
 }
