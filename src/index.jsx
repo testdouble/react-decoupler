@@ -38,9 +38,14 @@ export const withServices = Component => {
     static contextType = LocatorContext
     render() {
       const staticDeps = Component.dependencies || []
-      return (
-        <Component {...this.props} services={this.context.locate(staticDeps)} />
-      )
+
+      let injectedProps = {}
+      if (Array.isArray(staticDeps)) {
+        injectedProps.services = this.context.locate(staticDeps)
+      } else {
+        injectedProps = this.context.locate(staticDeps)
+      }
+      return <Component {...this.props} {...injectedProps} />
     }
   }
 

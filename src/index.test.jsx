@@ -103,7 +103,7 @@ describe('ServiceLocator', () => {
 })
 
 describe('withServices() HOC', () => {
-  it('passes declared dependencies as props', () => {
+  it('passes dependency list result as an Arrapy prop named "services"', () => {
     const App = props => {
       expect(props.services).toEqual([
         mockServices.func,
@@ -113,6 +113,30 @@ describe('withServices() HOC', () => {
       return 'done'
     }
     App.dependencies = ['func', 'ServiceClass', 'val']
+
+    const WrappedApp = withServices(App)
+    const { queryByText } = render(
+      <LocateServicesProvider services={mockServices}>
+        <WrappedApp />
+      </LocateServicesProvider>
+    )
+    expect(queryByText('done')).toBeInTheDocument()
+  })
+
+  it('supports named dependencies as direct props', () => {
+    const App = props => {
+      expect(props).toEqual({
+        MappedFunc: mockServices.func,
+        MappedClass: mockServices.ServiceClass,
+        MappedVal: mockServices.val,
+      })
+      return 'done'
+    }
+    App.dependencies = {
+      func: 'MappedFunc',
+      ServiceClass: 'MappedClass',
+      val: 'MappedVal',
+    }
 
     const WrappedApp = withServices(App)
     const { queryByText } = render(
@@ -177,6 +201,25 @@ describe('<InjectServices /> render prop component', () => {
       </LocateServicesProvider>
     )
   })
+
+  it('passes declared dependencies as args to child render prop', () => {
+    const App = props => {
+      return (
+        <InjectServices deps={{ func: 'NewNameFunc', val: 'NewVal' }}>
+          {({ NewNameFunc, NewVal }) => {
+            expect(NewNameFunc).toBe(mockServices.func)
+            expect(NewVal).toBe(mockServices.val)
+            return 'done'
+          }}
+        </InjectServices>
+      )
+    }
+    render(
+      <LocateServicesProvider services={mockServices}>
+        <App />
+      </LocateServicesProvider>
+    )
+  })
 })
 
 describe('useServicesLocator()', () => {
@@ -228,16 +271,35 @@ describe('useServicesLocator()', () => {
 })
 
 describe('useServices()', () => {
-  it('returns requested services', () => {
+  it('returns requested services array', () => {
+    const deps = ['func', 'ServiceClass', 'val']
+
     const App = () => {
-      const requestedServices = ['func', 'ServiceClass', 'val']
-      const [func, ServiceClass, val] = useServices(
-        requestedServices,
-        'missing'
-      )
+      const [func, ServiceClass, val] = useServices(deps)
+
       expect(func).toBe(mockServices.func)
       expect(ServiceClass).toBe(mockServices.ServiceClass)
       expect(val).toBe(mockServices.val)
+
+      return 'default'
+    }
+
+    render(
+      <LocateServicesProvider services={mockServices}>
+        <App />
+      </LocateServicesProvider>
+    )
+  })
+
+  it('returns requested services object', () => {
+    const deps = { func: 'NewNameFunc', ServiceClass: 'NewNameClass' }
+
+    const App = () => {
+      const { NewNameFunc, NewNameClass } = useServices(deps)
+
+      expect(NewNameFunc).toBe(mockServices.func)
+      expect(NewNameClass).toBe(mockServices.ServiceClass)
+
       return 'default'
     }
 
