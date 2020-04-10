@@ -1,28 +1,34 @@
 {
   "name": "react-service-injector",
   "version": "0.1.0",
-  "description": "Dependency Injection for React",
-  "main": "index.js",
-  "repository": "tgroshon/react-service-injector",
-  "author": "tgroshon",
+  "author": "Tommy Groshong <tom@groshong.software> (https://tommygroshong.com)",
+  "description": "Simple Dependency Injection for React",
   "license": "MIT",
+  "keywords": ["react", "dependency injection"],
+  "main": "index.js",
   "module": "dist/react-service-injector.mjs",
-  "sideEffects": false,
-  "scripts": {
-    "test": "is-ci \"test:ci\" \"test:dev\"",
-    "test:dev": "jest --watch",
-    "test:ci": "jest",
-    "build": "NODE_ENV=production rollup -c",
-    "start": "rollup -c -w",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn test:ci",
-    "release": "yarn publish",
-    "releaseNext": "yarn publish --tag next",
-    "format": "prettier {src,src/**,example/src,example/src/**}/*.{md,js,jsx,tsx} --write"
-  },
   "files": [
     "dist"
   ],
+  "homepage": "https://github.com/testdouble/react-service-injector",
+  "bugs": "https://github.com/testdouble/react-service-injectorissues",
+  "repository": {
+    "url": "https://github.com/testdouble/react-service-injector",
+    "type": "git"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "format": "prettier {src,src/**,example/src,example/src/**}/*.{md,js,jsx,tsx} --write",
+    "postversion": "git push --follow-tags",
+    "prepare": "cross-env NODE_ENV=production rollup -c",
+    "prepublishOnly": "yarn test:ci",
+    "release": "yarn publish",
+    "releaseNext": "yarn publish --tag next",
+    "start": "rollup -c -w",
+    "test": "is-ci \"test:ci\" \"test:dev\"",
+    "test:ci": "jest",
+    "test:dev": "jest --watch"
+  },
   "peerDependencies": {
     "react": "^16.6.3"
   },
@@ -40,6 +46,7 @@
     "babel-eslint": "^10.1.0",
     "babel-jest": "^25.2.6",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
+    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.8.0",
     "eslint-config-react-app": "^5.2.1",
