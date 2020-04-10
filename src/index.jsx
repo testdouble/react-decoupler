@@ -64,14 +64,6 @@ InjectServices.propTypes = {
 }
 
 export class ServiceLocator {
-  static fromServices(services) {
-    const loc = new ServiceLocator()
-    Object.keys(services).forEach(serviceKey => {
-      loc.add(serviceKey, services[serviceKey])
-    })
-    return loc
-  }
-
   constructor() {
     this._deps = new Map()
   }
@@ -92,6 +84,14 @@ export class ServiceLocator {
       }
       return this._deps.get(depKey)
     })
+  }
+
+  static fromServices(services) {
+    const loc = new ServiceLocator()
+    Object.keys(services).forEach(serviceKey => {
+      loc.add(serviceKey, services[serviceKey])
+    })
+    return loc
   }
 }
 
