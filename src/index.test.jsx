@@ -22,82 +22,82 @@ beforeEach(() => {
 })
 
 describe('ServiceInjector', () => {
-  let locator
+  let injector
   beforeEach(() => {
-    locator = new ServiceInjector()
+    injector = new ServiceInjector()
   })
 
   it('adds services to dep map', () => {
     const expectedMap = new Map()
     class A {}
     class B {}
-    locator.register('staticValue', 123)
+    injector.register('staticValue', 123)
     expectedMap.set('staticValue', 123)
-    locator.register('A', A)
+    injector.register('A', A)
     expectedMap.set('A', A)
-    locator.register('B', B)
+    injector.register('B', B)
     expectedMap.set('B', B)
 
-    expect(locator.dependencies).toEqual(expectedMap)
+    expect(injector.dependencies).toEqual(expectedMap)
   })
 
   it('returns a list of deps when given a list of keys', () => {
     class A {}
     class B {}
-    locator.register('A.super-complex-key', A)
-    locator.register('B', B)
+    injector.register('A.super-complex-key', A)
+    injector.register('B', B)
 
-    expect(locator.locate(['A.super-complex-key', 'B'])).toEqual([A, B])
+    expect(injector.locate(['A.super-complex-key', 'B'])).toEqual([A, B])
   })
 
   it('returns an object of deps keyed by name when given a key->name object', () => {
     class A {}
     class B {}
-    locator.register('A', A)
-    locator.register('B.super-complex-key', B)
+    injector.register('A', A)
+    injector.register('B.super-complex-key', B)
 
     expect(
-      locator.locate({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
+      injector.locate({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
     ).toEqual({ SimpleB: B, ComplexA: A })
   })
 
   it('throws when adding duplicate key', () => {
-    locator.register('val', 123)
+    injector.register('val', 123)
     expect(() => {
-      locator.register('val', 456)
+      injector.register('val', 456)
     }).toThrow()
   })
 
   it('throws when locating a missing key', () => {
-    locator.register('val', 123)
+    injector.register('val', 123)
     expect(() => {
-      locator.locate(['unknown'])
+      injector.locate(['unknown'])
     }).toThrow()
   })
 
   it('throws when locating with not an array or object', () => {
     expect(() => {
-      locator.locate(123)
+      injector.locate(123)
     }).toThrow()
 
     expect(() => {
-      locator.locate('unsupported string')
+      injector.locate('unsupported string')
     }).toThrow()
 
     expect(() => {
-      locator.locate(null)
+      injector.locate(null)
     }).toThrow()
 
     expect(() => {
-      locator.locate(true)
+      injector.locate(true)
     }).toThrow()
 
     expect(() => {
-      locator.locate([])
+      injector.locate([])
     }).not.toThrow()
 
     expect(() => {
-      locator.locate({})
+      injector.locate({})
     }).not.toThrow()
   })
 })
@@ -222,8 +222,8 @@ describe('<InjectServices /> render prop component', () => {
   })
 })
 
-describe('useServicesLocator()', () => {
-  it('returns default locator', () => {
+describe('useServicesInjector()', () => {
+  it('returns default injector', () => {
     const App = () => {
       const loc = useServiceInjector()
       expect(loc).toBeInstanceOf(ServiceInjector)
@@ -237,16 +237,16 @@ describe('useServicesLocator()', () => {
     )
   })
 
-  it('returns created locator', () => {
-    const locator = new ServiceInjector()
+  it('returns created injector', () => {
+    const injector = new ServiceInjector()
     const App = () => {
       const loc = useServiceInjector()
-      expect(loc).toBe(locator)
+      expect(loc).toBe(injector)
       return 'default'
     }
 
     render(
-      <LocateServicesProvider locator={locator}>
+      <LocateServicesProvider injector={injector}>
         <App />
       </LocateServicesProvider>
     )

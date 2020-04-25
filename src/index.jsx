@@ -2,27 +2,27 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 
-const LocatorContext = React.createContext()
+const InjectorContext = React.createContext()
 
 export const LocateServicesProvider = ({
   services,
-  locator,
+  injector,
   value,
   children,
 }) => {
-  if (!services && !locator) {
+  if (!services && !injector) {
     throw new Error(
-      'Must provider services or locator prop to LocateServicesProvider.'
+      'Must provider services or injector prop to LocateServicesProvider.'
     )
   }
 
-  const providerLocator = locator
-    ? locator
+  const providerLocator = injector
+    ? injector
     : ServiceInjector.fromServices(services)
   return (
-    <LocatorContext.Provider value={providerLocator}>
+    <InjectorContext.Provider value={providerLocator}>
       {children}
-    </LocatorContext.Provider>
+    </InjectorContext.Provider>
   )
 }
 
@@ -35,7 +35,7 @@ export const withServices = Component => {
 
   class C extends React.Component {
     static displayName = `withServices(${componentDisplayName})`
-    static contextType = LocatorContext
+    static contextType = InjectorContext
     render() {
       const staticDeps = Component.dependencies || []
 
@@ -53,15 +53,15 @@ export const withServices = Component => {
 }
 
 export const useServiceInjector = () => {
-  const locator = React.useContext(LocatorContext)
-  if (!locator) {
+  const injector = React.useContext(InjectorContext)
+  if (!injector) {
     throw new Error('Must be used inside a LocateServicesProvider')
   }
-  return locator
+  return injector
 }
 
 export class InjectServices extends React.Component {
-  static contextType = LocatorContext
+  static contextType = InjectorContext
 
   static propTypes = {
     children: PropTypes.func.isRequired,
@@ -72,12 +72,12 @@ export class InjectServices extends React.Component {
   }
 
   render() {
-    const locator = this.context
-    if (!locator) {
+    const injector = this.context
+    if (!injector) {
       throw new Error('Must be used inside a LocateServicesProvider')
     }
     const { children, deps } = this.props
-    return children(locator.locate(deps))
+    return children(injector.locate(deps))
   }
 }
 
@@ -135,6 +135,6 @@ export class ServiceInjector {
 }
 
 export const useServices = deps => {
-  const locator = useServiceInjector()
-  return locator.locate(deps)
+  const injector = useServiceInjector()
+  return injector.locate(deps)
 }
