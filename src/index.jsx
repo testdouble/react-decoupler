@@ -48,6 +48,11 @@ export const withServices = Component => {
 }
 
 export const useServiceInjector = () => {
+  if (!React.useContext) {
+    throw new Error(
+      'Hooks not found on React. Are you using React v16.8 or greater?'
+    )
+  }
   const injector = React.useContext(InjectorContext)
   if (!injector) {
     throw new Error('Must be used inside a InjectorProvider')
