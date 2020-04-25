@@ -12,7 +12,7 @@ export const LocateServicesProvider = ({
 }) => {
   if (!services && !injector) {
     throw new Error(
-      'Must provider services or injector prop to LocateServicesProvider.'
+      'Must provide services or injector prop to LocateServicesProvider.'
     )
   }
 
