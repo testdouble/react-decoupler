@@ -31,11 +31,11 @@ describe('ServiceInjector', () => {
     const expectedMap = new Map()
     class A {}
     class B {}
-    locator.add('staticValue', 123)
+    locator.register('staticValue', 123)
     expectedMap.set('staticValue', 123)
-    locator.add('A', A)
+    locator.register('A', A)
     expectedMap.set('A', A)
-    locator.add('B', B)
+    locator.register('B', B)
     expectedMap.set('B', B)
 
     expect(locator.dependencies).toEqual(expectedMap)
@@ -44,8 +44,8 @@ describe('ServiceInjector', () => {
   it('returns a list of deps when given a list of keys', () => {
     class A {}
     class B {}
-    locator.add('A.super-complex-key', A)
-    locator.add('B', B)
+    locator.register('A.super-complex-key', A)
+    locator.register('B', B)
 
     expect(locator.locate(['A.super-complex-key', 'B'])).toEqual([A, B])
   })
@@ -53,8 +53,8 @@ describe('ServiceInjector', () => {
   it('returns an object of deps keyed by name when given a key->name object', () => {
     class A {}
     class B {}
-    locator.add('A', A)
-    locator.add('B.super-complex-key', B)
+    locator.register('A', A)
+    locator.register('B.super-complex-key', B)
 
     expect(
       locator.locate({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
@@ -62,14 +62,14 @@ describe('ServiceInjector', () => {
   })
 
   it('throws when adding duplicate key', () => {
-    locator.add('val', 123)
+    locator.register('val', 123)
     expect(() => {
-      locator.add('val', 456)
+      locator.register('val', 456)
     }).toThrow()
   })
 
   it('throws when locating a missing key', () => {
-    locator.add('val', 123)
+    locator.register('val', 123)
     expect(() => {
       locator.locate(['unknown'])
     }).toThrow()

@@ -77,7 +77,7 @@ export class ServiceInjector {
     return new Map(this._deps)
   }
 
-  add(key, value) {
+  register(key, value) {
     if (this._deps.has(key)) {
       // TODO: only do this in DEV
       throw new Error(`Service key already used: ${key}`)
@@ -115,7 +115,7 @@ export class ServiceInjector {
   static fromServices(services) {
     const loc = new ServiceInjector()
     Object.keys(services).forEach(serviceKey => {
-      loc.add(serviceKey, services[serviceKey])
+      loc.register(serviceKey, services[serviceKey])
     })
     return loc
   }
