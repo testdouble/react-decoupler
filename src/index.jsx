@@ -18,7 +18,7 @@ export const LocateServicesProvider = ({
 
   const providerLocator = locator
     ? locator
-    : ServiceLocator.fromServices(services)
+    : ServiceInjector.fromServices(services)
   return (
     <LocatorContext.Provider value={providerLocator}>
       {children}
@@ -52,7 +52,7 @@ export const withServices = Component => {
   return hoistNonReactStatics(C, Component)
 }
 
-export const useServiceLocator = () => {
+export const useServiceInjector = () => {
   const locator = React.useContext(LocatorContext)
   if (!locator) {
     throw new Error('Must be used inside a LocateServicesProvider')
@@ -61,14 +61,14 @@ export const useServiceLocator = () => {
 }
 
 export const InjectServices = ({ deps, children }) => {
-  const locator = useServiceLocator()
+  const locator = useServiceInjector()
   return children(locator.locate(deps))
 }
 InjectServices.propTypes = {
   children: PropTypes.func.isRequired,
 }
 
-export class ServiceLocator {
+export class ServiceInjector {
   constructor() {
     this._deps = new Map()
   }
@@ -113,7 +113,7 @@ export class ServiceLocator {
   }
 
   static fromServices(services) {
-    const loc = new ServiceLocator()
+    const loc = new ServiceInjector()
     Object.keys(services).forEach(serviceKey => {
       loc.add(serviceKey, services[serviceKey])
     })
@@ -122,6 +122,6 @@ export class ServiceLocator {
 }
 
 export const useServices = deps => {
-  const locator = useServiceLocator()
+  const locator = useServiceInjector()
   return locator.locate(deps)
 }

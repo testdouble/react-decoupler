@@ -4,8 +4,8 @@ import {
   LocateServicesProvider,
   withServices,
   InjectServices,
-  ServiceLocator,
-  useServiceLocator,
+  ServiceInjector,
+  useServiceInjector,
   useServices,
 } from './index'
 
@@ -21,10 +21,10 @@ beforeEach(() => {
   }
 })
 
-describe('ServiceLocator', () => {
+describe('ServiceInjector', () => {
   let locator
   beforeEach(() => {
-    locator = new ServiceLocator()
+    locator = new ServiceInjector()
   })
 
   it('adds services to dep map', () => {
@@ -225,8 +225,8 @@ describe('<InjectServices /> render prop component', () => {
 describe('useServicesLocator()', () => {
   it('returns default locator', () => {
     const App = () => {
-      const loc = useServiceLocator()
-      expect(loc).toBeInstanceOf(ServiceLocator)
+      const loc = useServiceInjector()
+      expect(loc).toBeInstanceOf(ServiceInjector)
       return 'default'
     }
 
@@ -238,9 +238,9 @@ describe('useServicesLocator()', () => {
   })
 
   it('returns created locator', () => {
-    const locator = new ServiceLocator()
+    const locator = new ServiceInjector()
     const App = () => {
-      const loc = useServiceLocator()
+      const loc = useServiceInjector()
       expect(loc).toBe(locator)
       return 'default'
     }
@@ -254,7 +254,7 @@ describe('useServicesLocator()', () => {
 
   it('throws if not wrapped in provider', () => {
     const App = () => {
-      useServiceLocator()
+      useServiceInjector()
       return 'default'
     }
 
