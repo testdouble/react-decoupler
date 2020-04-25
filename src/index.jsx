@@ -60,12 +60,25 @@ export const useServiceInjector = () => {
   return locator
 }
 
-export const InjectServices = ({ deps, children }) => {
-  const locator = useServiceInjector()
-  return children(locator.locate(deps))
-}
-InjectServices.propTypes = {
-  children: PropTypes.func.isRequired,
+export class InjectServices extends React.Component {
+  static contextType = LocatorContext
+
+  static propTypes = {
+    children: PropTypes.func.isRequired,
+    deps: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.String),
+      PropTypes.objectOf(PropTypes.String),
+    ]),
+  }
+
+  render() {
+    const locator = this.context
+    if (!locator) {
+      throw new Error('Must be used inside a LocateServicesProvider')
+    }
+    const { children, deps } = this.props
+    return children(locator.locate(deps))
+  }
 }
 
 export class ServiceInjector {
