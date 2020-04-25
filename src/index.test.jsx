@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import {
-  LocateServicesProvider,
+  InjectorProvider,
   withServices,
   InjectServices,
   ServiceInjector,
@@ -116,9 +116,9 @@ describe('withServices() HOC', () => {
 
     const WrappedApp = withServices(App)
     const { queryByText } = render(
-      <LocateServicesProvider services={mockServices}>
+      <InjectorProvider services={mockServices}>
         <WrappedApp />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
     expect(queryByText('done')).toBeInTheDocument()
   })
@@ -140,9 +140,9 @@ describe('withServices() HOC', () => {
 
     const WrappedApp = withServices(App)
     const { queryByText } = render(
-      <LocateServicesProvider services={mockServices}>
+      <InjectorProvider services={mockServices}>
         <WrappedApp />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
     expect(queryByText('done')).toBeInTheDocument()
   })
@@ -152,9 +152,9 @@ describe('withServices() HOC', () => {
 
     const WrappedApp = withServices(App)
     const { queryByText } = render(
-      <LocateServicesProvider services={mockServices}>
+      <InjectorProvider services={mockServices}>
         <WrappedApp />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
     expect(queryByText('done')).toBeInTheDocument()
   })
@@ -196,9 +196,9 @@ describe('<InjectServices /> render prop component', () => {
       )
     }
     render(
-      <LocateServicesProvider services={mockServices}>
+      <InjectorProvider services={mockServices}>
         <App />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
   })
 
@@ -215,9 +215,9 @@ describe('<InjectServices /> render prop component', () => {
       )
     }
     render(
-      <LocateServicesProvider services={mockServices}>
+      <InjectorProvider services={mockServices}>
         <App />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
   })
 })
@@ -231,9 +231,9 @@ describe('useServicesInjector()', () => {
     }
 
     render(
-      <LocateServicesProvider services={{}}>
+      <InjectorProvider services={{}}>
         <App />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
   })
 
@@ -246,9 +246,9 @@ describe('useServicesInjector()', () => {
     }
 
     render(
-      <LocateServicesProvider injector={injector}>
+      <InjectorProvider injector={injector}>
         <App />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
   })
 
@@ -285,9 +285,9 @@ describe('useServices()', () => {
     }
 
     render(
-      <LocateServicesProvider services={mockServices}>
+      <InjectorProvider services={mockServices}>
         <App />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
   })
 
@@ -304,9 +304,9 @@ describe('useServices()', () => {
     }
 
     render(
-      <LocateServicesProvider services={mockServices}>
+      <InjectorProvider services={mockServices}>
         <App />
-      </LocateServicesProvider>
+      </InjectorProvider>
     )
   })
 })

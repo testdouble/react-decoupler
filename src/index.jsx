@@ -4,15 +4,10 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 
 const InjectorContext = React.createContext()
 
-export const LocateServicesProvider = ({
-  services,
-  injector,
-  value,
-  children,
-}) => {
+export const InjectorProvider = ({ services, injector, value, children }) => {
   if (!services && !injector) {
     throw new Error(
-      'Must provide services or injector prop to LocateServicesProvider.'
+      'Must provide services or injector prop to InjectorProvider.'
     )
   }
 
@@ -55,7 +50,7 @@ export const withServices = Component => {
 export const useServiceInjector = () => {
   const injector = React.useContext(InjectorContext)
   if (!injector) {
-    throw new Error('Must be used inside a LocateServicesProvider')
+    throw new Error('Must be used inside a InjectorProvider')
   }
   return injector
 }
@@ -74,7 +69,7 @@ export class InjectServices extends React.Component {
   render() {
     const injector = this.context
     if (!injector) {
-      throw new Error('Must be used inside a LocateServicesProvider')
+      throw new Error('Must be used inside a InjectorProvider')
     }
     const { children, deps } = this.props
     return children(injector.locate(deps))
