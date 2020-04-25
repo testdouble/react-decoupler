@@ -47,19 +47,6 @@ export const withServices = Component => {
   return hoistNonReactStatics(C, Component)
 }
 
-export const useServiceInjector = () => {
-  if (!React.useContext) {
-    throw new Error(
-      'Hooks not found on React. Are you using React v16.8 or greater?'
-    )
-  }
-  const injector = React.useContext(InjectorContext)
-  if (!injector) {
-    throw new Error('Must be used inside a InjectorProvider')
-  }
-  return injector
-}
-
 export class InjectServices extends React.Component {
   static contextType = InjectorContext
 
@@ -132,6 +119,25 @@ export class ServiceInjector {
     })
     return loc
   }
+}
+
+/**
+ * The Hooks API:
+ *  - useServiceInjector(): returns the Injector from context.
+ *  - useServices(deps): resolves the given dependencies and returns them
+ */
+
+export const useServiceInjector = () => {
+  if (!React.useContext) {
+    throw new Error(
+      'Hooks not found on React. Are you using React v16.8 or greater?'
+    )
+  }
+  const injector = React.useContext(InjectorContext)
+  if (!injector) {
+    throw new Error('Must be used inside a InjectorProvider')
+  }
+  return injector
 }
 
 export const useServices = deps => {
