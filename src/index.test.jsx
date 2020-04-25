@@ -27,20 +27,6 @@ describe('ServiceInjector', () => {
     injector = new ServiceInjector()
   })
 
-  it('adds services to dep map', () => {
-    const expectedMap = new Map()
-    class A {}
-    class B {}
-    injector.register('staticValue', 123)
-    expectedMap.set('staticValue', 123)
-    injector.register('A', A)
-    expectedMap.set('A', A)
-    injector.register('B', B)
-    expectedMap.set('B', B)
-
-    expect(injector.dependencies).toEqual(expectedMap)
-  })
-
   it('returns a list of deps when given a list of keys', () => {
     class A {}
     class B {}
@@ -99,6 +85,22 @@ describe('ServiceInjector', () => {
     expect(() => {
       injector.resolve({})
     }).not.toThrow()
+  })
+
+  it('registers service with setting to instantiate it when resolved', () => {
+    class A {}
+    class B {}
+    injector.register('A', A)
+    injector.register('B', B, { asInstance: true })
+
+    const arrResult = injector.resolve(['A', 'B'])
+    const objResult = injector.resolve({ A: 'A', B: 'b' })
+
+    expect(arrResult[0]).toBe(A)
+    expect(arrResult[1]).toBeInstanceOf(B)
+
+    expect(objResult.A).toBe(A)
+    expect(objResult.b).toBeInstanceOf(B)
   })
 })
 

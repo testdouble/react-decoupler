@@ -77,30 +77,33 @@ export class ServiceInjector {
     return new Map(this._deps)
   }
 
-  register(key, value) {
+  register(key, service, options = {}) {
     if (this._deps.has(key)) {
       // TODO: only do this in DEV
       throw new Error(`Service key already used: ${key}`)
     }
-    this._deps.set(key, value)
+    this._deps.set(key, { service, options })
+  }
+
+  _lookup = key => {
+    if (!this._deps.has(key)) {
+      // TODO: only do this in DEV
+      throw new Error(`No service matching key: ${key}`)
+    }
+    const { service, options } = this._deps.get(key)
+    if (options.asInstance) {
+      return new service()
+    }
+
+    return service
   }
 
   resolve(dependencies) {
     if (Array.isArray(dependencies)) {
-      return dependencies.map(key => {
-        if (!this._deps.has(key)) {
-          // TODO: only do this in DEV
-          throw new Error(`No service matching key: ${key}`)
-        }
-        return this._deps.get(key)
-      })
+      return dependencies.map(this._lookup)
     } else if (!!dependencies && typeof dependencies === 'object') {
       return Object.entries(dependencies).reduce((result, [key, name]) => {
-        if (!this._deps.has(key)) {
-          // TODO: only do this in DEV
-          throw new Error(`No service matching key: ${key}`)
-        }
-        result[name] = this._deps.get(key)
+        result[name] = this._lookup(key)
         return result
       }, {})
     } else {
