@@ -47,7 +47,7 @@ describe('ServiceInjector', () => {
     injector.register('A.super-complex-key', A)
     injector.register('B', B)
 
-    expect(injector.locate(['A.super-complex-key', 'B'])).toEqual([A, B])
+    expect(injector.resolve(['A.super-complex-key', 'B'])).toEqual([A, B])
   })
 
   it('returns an object of deps keyed by name when given a key->name object', () => {
@@ -57,7 +57,7 @@ describe('ServiceInjector', () => {
     injector.register('B.super-complex-key', B)
 
     expect(
-      injector.locate({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
+      injector.resolve({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
     ).toEqual({ SimpleB: B, ComplexA: A })
   })
 
@@ -71,33 +71,33 @@ describe('ServiceInjector', () => {
   it('throws when locating a missing key', () => {
     injector.register('val', 123)
     expect(() => {
-      injector.locate(['unknown'])
+      injector.resolve(['unknown'])
     }).toThrow()
   })
 
   it('throws when locating with not an array or object', () => {
     expect(() => {
-      injector.locate(123)
+      injector.resolve(123)
     }).toThrow()
 
     expect(() => {
-      injector.locate('unsupported string')
+      injector.resolve('unsupported string')
     }).toThrow()
 
     expect(() => {
-      injector.locate(null)
+      injector.resolve(null)
     }).toThrow()
 
     expect(() => {
-      injector.locate(true)
+      injector.resolve(true)
     }).toThrow()
 
     expect(() => {
-      injector.locate([])
+      injector.resolve([])
     }).not.toThrow()
 
     expect(() => {
-      injector.locate({})
+      injector.resolve({})
     }).not.toThrow()
   })
 })

@@ -36,9 +36,9 @@ export const withServices = Component => {
 
       let injectedProps = {}
       if (Array.isArray(staticDeps)) {
-        injectedProps.services = this.context.locate(staticDeps)
+        injectedProps.services = this.context.resolve(staticDeps)
       } else {
-        injectedProps = this.context.locate(staticDeps)
+        injectedProps = this.context.resolve(staticDeps)
       }
       return <Component {...this.props} {...injectedProps} />
     }
@@ -64,7 +64,7 @@ export class InjectServices extends React.Component {
       throw new Error('Must be used inside a InjectorProvider')
     }
     const { children, deps } = this.props
-    return children(injector.locate(deps))
+    return children(injector.resolve(deps))
   }
 }
 
@@ -85,7 +85,7 @@ export class ServiceInjector {
     this._deps.set(key, value)
   }
 
-  locate(dependencies) {
+  resolve(dependencies) {
     if (Array.isArray(dependencies)) {
       return dependencies.map(key => {
         if (!this._deps.has(key)) {
@@ -142,5 +142,5 @@ export const useServiceInjector = () => {
 
 export const useServices = deps => {
   const injector = useServiceInjector()
-  return injector.locate(deps)
+  return injector.resolve(deps)
 }
