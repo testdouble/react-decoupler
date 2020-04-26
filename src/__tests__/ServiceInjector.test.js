@@ -157,4 +157,8 @@ describe('ServiceInjector', () => {
       injector.register('MyClass', class Bob {}, { withParams: ['A'] })
     }).not.toThrow()
   })
+
+  it.skip('supports vanilla JS values in withParams', () => {
+    throw new Error('Not Implemented!')
+  })
 })
