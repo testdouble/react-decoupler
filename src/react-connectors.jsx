@@ -5,6 +5,24 @@ import ServiceInjector from './ServiceInjector'
 
 const InjectorContext = React.createContext()
 
+/**
+ * @name: InjectorProvider
+ * @description: React Context Provider for library.
+ * @usage:
+ *
+ *     // With Injector instance
+ *     <InjectorProvider injector={serviceInjectorInstance}>
+ *       <YourApp />
+ *     </InjectorProvider
+ *
+ *     // OR With Services map
+ *     const servicesMap = {
+ *       'ServiceKey': Service
+ *     }
+ *     <InjectorProvider services={servicesMap}>
+ *       <YourApp />
+ *     </InjectorProvider
+ */
 export const InjectorProvider = ({ services, injector, value, children }) => {
   if (!services && !injector) {
     throw new Error(
@@ -22,6 +40,19 @@ export const InjectorProvider = ({ services, injector, value, children }) => {
   )
 }
 
+/**
+ * @name: withServices
+ * @description: Higher-order Component for injecting services as props.
+ * @usage:
+ *
+ *     const MyComponent = ({ServiceA, ServiceB}) => {
+ *       return <div />
+ *     }
+ *
+ *     MyComponent.dependencies = ['ServiceA', 'ServiceB']
+ *
+ *     export default withServices(MyComponent)
+ */
 export const withServices = Component => {
   const componentDisplayName =
     Component.displayName ||
@@ -48,6 +79,21 @@ export const withServices = Component => {
   return hoistNonReactStatics(C, Component)
 }
 
+/**
+ * @name: InjectServices
+ * @description: Render Prop component for injecting services.
+ * @usage:
+ *
+ *     const App = () => {
+ *       return (
+ *         <InjectServices deps={['func', 'ServiceClass', 'val']}>
+ *           {({func, ServiceClas, val}) => {
+ *             return <div />
+ *           }}
+ *         </InjectServices>
+ *       )
+ *     }
+ */
 export class InjectServices extends React.Component {
   static contextType = InjectorContext
 
@@ -70,11 +116,16 @@ export class InjectServices extends React.Component {
 }
 
 /**
- * The Hooks API:
- *  - useServiceInjector(): returns the Injector from context.
- *  - useServices(deps): resolves the given dependencies and returns them
+ * @name: useServiceInjector
+ * @description: Hook to return the Injector from context.
+ * @usage:
+ *
+ *     const App = () => {
+ *       const injector = useServiceInjector()
+ *       const [A] = injector.resolve(['A'])
+ *       return <div />
+ *     }
  */
-
 export const useServiceInjector = () => {
   if (!React.useContext) {
     throw new Error(
@@ -88,6 +139,18 @@ export const useServiceInjector = () => {
   return injector
 }
 
+/**
+ * @name: useServices
+ * @description: Hook to resolve and return the given dependencies
+ * @usage:
+ *
+ *     const SERVICES = ['A', 'B']
+ *
+ *     const App = () => {
+ *       const [A, B] = useServices(SERVICES)
+ *       return <div />
+ *     }
+ */
 export const useServices = deps => {
   const injector = useServiceInjector()
   return injector.resolve(deps)
