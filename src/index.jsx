@@ -69,6 +69,14 @@ export class InjectServices extends React.Component {
 }
 
 export class ServiceInjector {
+  static fromServices(services) {
+    const loc = new ServiceInjector()
+    Object.keys(services).forEach(serviceKey => {
+      loc.register(serviceKey, services[serviceKey])
+    })
+    return loc
+  }
+
   constructor() {
     this._deps = new Map()
     this._boundLookups = new Map()
@@ -142,14 +150,6 @@ export class ServiceInjector {
       return options.withParams.map(this._lookup)
     }
     return []
-  }
-
-  static fromServices(services) {
-    const loc = new ServiceInjector()
-    Object.keys(services).forEach(serviceKey => {
-      loc.register(serviceKey, services[serviceKey])
-    })
-    return loc
   }
 }
 
