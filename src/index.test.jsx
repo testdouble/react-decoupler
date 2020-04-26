@@ -102,6 +102,82 @@ describe('ServiceInjector', () => {
     expect(objResult.A).toBe(A)
     expect(objResult.b).toBeInstanceOf(B)
   })
+
+  it('registers service as instance with other services as paramaters to constructor', () => {
+    class A {}
+    class B {
+      constructor(...args) {
+        this.constructorArgs = args
+      }
+    }
+    class C {
+      constructor(...args) {
+        this.constructorArgs = args
+      }
+    }
+    injector.register('A', A)
+    injector.register('B', B, { asInstance: true, withParams: ['A', 'C'] })
+    injector.register('C', C, { asInstance: true, withParams: ['A'] })
+
+    const [bInstance] = injector.resolve(['B'])
+
+    expect(bInstance.constructorArgs.length).toEqual(2)
+
+    const [argA, argC] = bInstance.constructorArgs
+    expect(argA).toEqual(A)
+    expect(argC).toBeInstanceOf(C)
+    expect(argC.constructorArgs).toEqual([A])
+  })
+
+  it('resolves a consistent, bound function when registered withParams but not asInstance', () => {
+    class A {}
+    function bFunc(AClass) {
+      return AClass
+    }
+    class C {
+      constructor(...args) {
+        this.constructorArgs = args
+      }
+    }
+
+    injector.register('A', A)
+    injector.register('bFunc', bFunc, { asInstance: false, withParams: ['A'] })
+    injector.register('CStaticBound', C, {
+      asInstance: false,
+      withParams: ['A'],
+    })
+
+    const [resolvedBFunc, resolvedCStaticBound] = injector.resolve([
+      'bFunc',
+      'CStaticBound',
+    ])
+    const [resolvedBFunc2nd, resolvedCStaticBound2nd] = injector.resolve([
+      'bFunc',
+      'CStaticBound',
+    ])
+
+    expect(resolvedBFunc2nd).toBe(resolvedBFunc)
+    expect(resolvedCStaticBound2nd).toBe(resolvedCStaticBound)
+    expect(resolvedBFunc()).toBe(A)
+
+    const cInstance = new resolvedCStaticBound()
+    expect(cInstance.constructorArgs).toEqual([A])
+    expect(cInstance).toBeInstanceOf(C)
+  })
+
+  it('throws if register called withParams for a non-callable', () => {
+    expect(() => {
+      injector.register('MyNotFunc', 1234321, { withParams: ['A'] })
+    }).toThrow()
+
+    expect(() => {
+      injector.register('MyFunc', () => {}, { withParams: ['A'] })
+    }).not.toThrow()
+
+    expect(() => {
+      injector.register('MyClass', class Bob {}, { withParams: ['A'] })
+    }).not.toThrow()
+  })
 })
 
 describe('withServices() HOC', () => {

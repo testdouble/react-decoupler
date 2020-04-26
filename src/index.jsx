@@ -71,6 +71,7 @@ export class InjectServices extends React.Component {
 export class ServiceInjector {
   constructor() {
     this._deps = new Map()
+    this._boundLookups = new Map()
   }
 
   get dependencies() {
@@ -82,20 +83,12 @@ export class ServiceInjector {
       // TODO: only do this in DEV
       throw new Error(`Service key already used: ${key}`)
     }
+    if (options.withParams && typeof service !== 'function') {
+      throw new Error(
+        `Cannot use "withParams" option with ${key} of type ${typeof service}; must be function or class.`
+      )
+    }
     this._deps.set(key, { service, options })
-  }
-
-  _lookup = key => {
-    if (!this._deps.has(key)) {
-      // TODO: only do this in DEV
-      throw new Error(`No service matching key: ${key}`)
-    }
-    const { service, options } = this._deps.get(key)
-    if (options.asInstance) {
-      return new service()
-    }
-
-    return service
   }
 
   resolve(dependencies) {
@@ -113,6 +106,42 @@ export class ServiceInjector {
         )}`
       )
     }
+  }
+
+  _lookup = key => {
+    if (!this._deps.has(key)) {
+      // TODO: only do this in DEV
+      throw new Error(`No service matching key: ${key}`)
+    }
+
+    const { service, options } = this._deps.get(key)
+
+    if (options.withParams) {
+      if (!this._boundLookups.has(key)) {
+        const args = this._makeDepArgs(options)
+        this._boundLookups.set(key, service.bind(null, ...args))
+      }
+
+      const boundService = this._boundLookups.get(key)
+      if (options.asInstance) {
+        return new boundService()
+      }
+
+      return boundService
+    }
+
+    if (options.asInstance) {
+      return new service()
+    }
+
+    return service
+  }
+
+  _makeDepArgs = options => {
+    if (Array.isArray(options.withParams)) {
+      return options.withParams.map(this._lookup)
+    }
+    return []
   }
 
   static fromServices(services) {
