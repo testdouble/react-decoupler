@@ -15,6 +15,25 @@ describe('ServiceInjector', () => {
     expect(injector.resolve(['A.super-complex-key', 'B'])).toEqual([A, B])
   })
 
+  it('register supports strings, funcs, numbers, and symbols as keys', () => {
+    class Foo {}
+    class Bar {}
+    class Baz {}
+    class Qux {}
+    const FOO_KEY = 'FOO_KEY_STR'
+    const BAR_KEY = Symbol('Bar symbol key')
+    const BAZ_KEY = 1234
+    const QUX_KEY = () => {}
+    injector.register(FOO_KEY, Foo)
+    injector.register(BAR_KEY, Bar)
+    injector.register(BAZ_KEY, Baz)
+    injector.register(QUX_KEY, Qux)
+
+    const resolvedVals = injector.resolve([FOO_KEY, BAR_KEY, BAZ_KEY, QUX_KEY])
+
+    expect(resolvedVals).toEqual([Foo, Bar, Baz, Qux])
+  })
+
   it('returns an object of deps keyed by name when given a key->name object', () => {
     class A {}
     class B {}

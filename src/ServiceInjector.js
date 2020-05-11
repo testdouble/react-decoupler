@@ -7,6 +7,8 @@ const assertInDev = (predicate, failureMessage) => {
   }
 }
 
+const toString = val => (!!val.toString ? val.toString() : val)
+
 const lookupSymbol = Symbol('Injector Lookup Symbol')
 /**
  * Factory function to tag a paramater indicating you want it looked up during resolution
@@ -39,7 +41,10 @@ export default class ServiceInjector {
   }
 
   register(key, service, options = {}) {
-    assertInDev(!this._deps.has(key), `Service key already used: ${key}`)
+    assertInDev(
+      !this._deps.has(key),
+      `Service key already used: ${toString(key)}`
+    )
 
     if (options.withParams && typeof service !== 'function') {
       throw new Error(
@@ -67,7 +72,10 @@ export default class ServiceInjector {
   }
 
   _lookup = key => {
-    assertInDev(this._deps.has(key), `Expected a service matching key: ${key}`)
+    assertInDev(
+      this._deps.has(key),
+      `Expected a service matching key: ${toString(key)}`
+    )
 
     const { service, options } = this._deps.get(key)
 
