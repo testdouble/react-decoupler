@@ -3,6 +3,7 @@ import { terser } from 'rollup-plugin-terser';
 import size from 'rollup-plugin-size';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import replace from '@rollup/plugin-replace';
 
 const PACKAGE_NAME = 'ReactServiceInjector';
 const FILE_BASE_NAME = 'react-service-injector';
@@ -24,7 +25,15 @@ export default [
       sourcemap: true,
     },
     external,
-    plugins: [nodeResolve(), babel({ exclude: /node_modules/ }), commonjs()],
+    plugins: [
+      replace({
+        exclude: 'node_modules/**',
+        'process.env.NODE_ENV': JSON.stringify('dev'),
+      }),
+      nodeResolve(),
+      babel({ exclude: /node_modules/ }),
+      commonjs(),
+    ],
   },
   {
     input,
@@ -35,6 +44,10 @@ export default [
     },
     external,
     plugins: [
+      replace({
+        exclude: 'node_modules/**',
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      }),
       nodeResolve(),
       babel({ exclude: /node_modules/ }),
       commonjs(),
@@ -51,7 +64,15 @@ export default [
       globals,
     },
     external,
-    plugins: [nodeResolve(), babel({ exclude: /node_modules/ }), commonjs()],
+    plugins: [
+      replace({
+        exclude: 'node_modules/**',
+        'process.env.NODE_ENV': JSON.stringify('dev'),
+      }),
+      nodeResolve(),
+      babel({ exclude: /node_modules/ }),
+      commonjs(),
+    ],
   },
   {
     input,
@@ -64,6 +85,10 @@ export default [
     },
     external,
     plugins: [
+      replace({
+        exclude: 'node_modules/**',
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      }),
       nodeResolve(),
       babel({ exclude: /node_modules/ }),
       commonjs(),

@@ -1,8 +1,7 @@
 /** The module core of registering and resolving dependencies. */
 
 const assertInDev = (predicate, failureMessage) => {
-  // TODO: only do this in developer builds
-  if (!predicate) {
+  if (process.env.NODE_ENV !== 'production' && !predicate) {
     throw new Error(failureMessage);
   }
 };
