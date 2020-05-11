@@ -1,5 +1,28 @@
+/** The module core of registering and resolving dependencies. */
+
+const assertInDev = (predicate, failureMessage) => {
+  // TODO: only do this in developer builds
+  if (!predicate) {
+    throw new Error(failureMessage)
+  }
+}
+
+const lookupSymbol = Symbol('Injector Lookup Symbol')
 /**
- * Core class
+ * Factory function to tag a paramater indicating you want it looked up during resolution
+ *
+ * Usage:
+ *   injector.register('MyServiceKey', MyService, {withParams: [Lookup('OtherServiceKey')]})
+ */
+export const Lookup = value => {
+  if (value == null) {
+    throw new Error('Lookup() does not support nullish values')
+  }
+  return { [lookupSymbol]: value }
+}
+
+/**
+ * Core implementation for a ServiceInjector.
  */
 export default class ServiceInjector {
   static fromServices(services) {
@@ -15,15 +38,9 @@ export default class ServiceInjector {
     this._boundLookups = new Map()
   }
 
-  get dependencies() {
-    return new Map(this._deps)
-  }
-
   register(key, service, options = {}) {
-    if (this._deps.has(key)) {
-      // TODO: only do this in DEV
-      throw new Error(`Service key already used: ${key}`)
-    }
+    assertInDev(!this._deps.has(key), `Service key already used: ${key}`)
+
     if (options.withParams && typeof service !== 'function') {
       throw new Error(
         `Cannot use "withParams" option with ${key} of type ${typeof service}; must be function or class.`
@@ -50,10 +67,7 @@ export default class ServiceInjector {
   }
 
   _lookup = key => {
-    if (!this._deps.has(key)) {
-      // TODO: only do this in DEV
-      throw new Error(`No service matching key: ${key}`)
-    }
+    assertInDev(this._deps.has(key), `Expected a service matching key: ${key}`)
 
     const { service, options } = this._deps.get(key)
 
@@ -80,7 +94,13 @@ export default class ServiceInjector {
 
   _makeDepArgs = options => {
     if (Array.isArray(options.withParams)) {
-      return options.withParams.map(this._lookup)
+      return options.withParams.map(param => {
+        if (typeof param === 'object' && param[lookupSymbol] != null) {
+          return this._lookup(param[lookupSymbol])
+        } else {
+          return param
+        }
+      })
     }
     return []
   }

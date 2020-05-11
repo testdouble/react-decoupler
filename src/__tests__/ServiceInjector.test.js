@@ -1,4 +1,4 @@
-import ServiceInjector from '../ServiceInjector.js'
+import ServiceInjector, { Lookup as L } from '../ServiceInjector.js'
 
 describe('ServiceInjector', () => {
   let injector
@@ -95,8 +95,11 @@ describe('ServiceInjector', () => {
       }
     }
     injector.register('A', A)
-    injector.register('B', B, { asInstance: true, withParams: ['A', 'C'] })
-    injector.register('C', C, { asInstance: true, withParams: ['A'] })
+    injector.register('B', B, {
+      asInstance: true,
+      withParams: [L('A'), L('C')],
+    })
+    injector.register('C', C, { asInstance: true, withParams: [L('A')] })
 
     const [bInstance] = injector.resolve(['B'])
 
@@ -120,10 +123,13 @@ describe('ServiceInjector', () => {
     }
 
     injector.register('A', A)
-    injector.register('bFunc', bFunc, { asInstance: false, withParams: ['A'] })
+    injector.register('bFunc', bFunc, {
+      asInstance: false,
+      withParams: [L('A')],
+    })
     injector.register('CStaticBound', C, {
       asInstance: false,
-      withParams: ['A'],
+      withParams: [L('A')],
     })
 
     const [resolvedBFunc, resolvedCStaticBound] = injector.resolve([
@@ -158,7 +164,29 @@ describe('ServiceInjector', () => {
     }).not.toThrow()
   })
 
-  it.skip('supports vanilla JS values in withParams', () => {
-    throw new Error('Not Implemented!')
+  it('supports vanilla JS values in withParams', () => {
+    class Foo {
+      constructor(...args) {
+        this.constructorArgs = args
+      }
+    }
+    class Bar {}
+
+    const immutableValObj = Object.freeze({ thingy: 'myvalue' })
+    injector.register('Foo', Foo, {
+      asInstance: true,
+      withParams: [L('Bar'), 'Bar', immutableValObj, true],
+    })
+    injector.register('Bar', Bar)
+
+    const [fooInstance] = injector.resolve(['Foo'])
+
+    expect(fooInstance).toBeInstanceOf(Foo)
+    expect(fooInstance.constructorArgs.length).toEqual(4)
+    const [BarRef, barStr, immValObjRef, boolArg] = fooInstance.constructorArgs
+    expect(BarRef).toBe(Bar)
+    expect(barStr).toBe('Bar')
+    expect(immValObjRef).toBe(immutableValObj)
+    expect(boolArg).toBe(true)
   })
 })
