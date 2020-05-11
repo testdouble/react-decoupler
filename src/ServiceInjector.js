@@ -14,7 +14,10 @@ const lookupSymbol = Symbol('Injector Lookup Symbol');
  * Factory function to tag a paramater indicating you want it looked up during resolution
  *
  * Usage:
- *   injector.register('MyServiceKey', MyService, {withParams: [Lookup('OtherServiceKey')]})
+ *
+ *     injector.register('OtherServiceKey', OtherService)
+ *     injector.register('MyServiceKey', MyService, {withParams: [Lookup('OtherServiceKey')]})
+ *
  */
 export const Lookup = value => {
   if (value == null) {
