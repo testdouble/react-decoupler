@@ -1,21 +1,23 @@
-import babel from 'rollup-plugin-babel'
-import { terser } from 'rollup-plugin-terser'
-import size from 'rollup-plugin-size'
-import nodeResolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
+import babel from 'rollup-plugin-babel';
+import { terser } from 'rollup-plugin-terser';
+import size from 'rollup-plugin-size';
+import nodeResolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 
-const PACKAGE_NAME = 'ReactServiceInjector'
-const FILE_BASE_NAME = 'react-service-injector'
+const PACKAGE_NAME = 'ReactServiceInjector';
+const FILE_BASE_NAME = 'react-service-injector';
 
-const external = ['react', 'prop-types']
+const external = ['react', 'prop-types'];
 const globals = {
   react: 'React',
   'prop-types': 'PropTypes',
-}
+};
+
+const input = 'src/index.js';
 
 export default [
   {
-    input: 'src/index.jsx',
+    input,
     output: {
       file: `dist/${FILE_BASE_NAME}.mjs`,
       format: 'es',
@@ -25,7 +27,7 @@ export default [
     plugins: [nodeResolve(), babel({ exclude: /node_modules/ }), commonjs()],
   },
   {
-    input: 'src/index.jsx',
+    input,
     output: {
       file: `dist/${FILE_BASE_NAME}.min.mjs`,
       format: 'es',
@@ -40,7 +42,7 @@ export default [
     ],
   },
   {
-    input: 'src/index.jsx',
+    input,
     output: {
       name: PACKAGE_NAME,
       file: `dist/${FILE_BASE_NAME}.development.js`,
@@ -52,7 +54,7 @@ export default [
     plugins: [nodeResolve(), babel({ exclude: /node_modules/ }), commonjs()],
   },
   {
-    input: 'src/index.jsx',
+    input,
     output: {
       name: PACKAGE_NAME,
       file: `dist/${FILE_BASE_NAME}.production.min.js`,
@@ -69,4 +71,4 @@ export default [
       size(),
     ],
   },
-]
+];
