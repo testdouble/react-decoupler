@@ -23,7 +23,41 @@ components to make accessing it easier.
 Why would you use this? Because you are too lazy (in a good way), to write the
 few hundred lines of glue code and tests to provide the same, simple API.
 
-### Example
+### Examples
+
+#### Simple Example
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {
+  ServiceInjector,
+  InjectorProvider,
+  useServices,
+} from 'react-decoupler';
+
+const injector = new ServiceInjector();
+injector.register('helloworld', name => `Hello, ${name ? name : 'World'}!`);
+
+function App() {
+  const [getGreeting] = useServices(['helloWorld']);
+  return (
+    <div>
+      <span>{getGreeting()}</span>
+      <span>{getGreeting('Foo')}</span>
+    </div>
+  );
+}
+
+ReactDOM.render(
+  <InjectorProvider injector={injector}>
+    <App />
+  </InjectorProvider>,
+  document.getElementById('app')
+);
+```
+
+#### Big Example
 
 ```javascript
 // index.js
@@ -76,7 +110,12 @@ injector.register('APIClient', APIClient, {
 // test modules in isolation by filling an injector with mocked dependencies (b)
 // swap out dependencies in different parts of the app without updating imports
 
-injector.register('axios', axios.create({ /* custom params */ }));
+injector.register(
+  'axios',
+  axios.create({
+    /* custom params */
+  })
+);
 
 /* START --- Contrived Example Code */
 export class APIClient {
@@ -234,15 +273,15 @@ import { APIClient, calculateVehicleRange, TripManager } from './services';
 
 describe('APIClient', () => {
   it('has never been so easy to test a service wrapping axios', async () => {
-    const mockAxios = {get: jest.fn().mockResolvedValue()};
+    const mockAxios = { get: jest.fn().mockResolvedValue() };
     const mockPageSize = 25;
     const client = new APIClient(mockAxios, mockPageSize);
 
     const vehicleListResult = await client.listVehicles();
-    expect(mockAxios.get).toBeCalledWith(`/vehicles?per_page${mockPageSize}`)
+    expect(mockAxios.get).toBeCalledWith(`/vehicles?per_page${mockPageSize}`);
 
     const vehicleResult = await client.getVehicle(1);
-    expect(mockAxios.get).toBeCalledWith(`/vehicles/1`)
+    expect(mockAxios.get).toBeCalledWith(`/vehicles/1`);
   });
 });
 
@@ -257,7 +296,6 @@ describe('calculateVehicleRange', () => {
     /* write your test */
   });
 });
-
 ```
 
 ## API Reference
@@ -462,7 +500,7 @@ Render Prop component for injecting services.
 function App() {
   return (
     <InjectServices deps={['funcKey', 'ServiceClass', 'val']}>
-      {([ func, ServiceClas, val ]) => {
+      {([func, ServiceClas, val]) => {
         return <div />;
       }}
     </InjectServices>
@@ -486,13 +524,15 @@ function AppServiceArray({ services }) {
 AppServiceArray.dependencies = ['AServiceKey', 'BServiceKey'];
 export const WrappedAppServiceArray = withServices(AppServiceArray);
 
-
 // Object service resolution keys:
 function AppServiceObj({ serviceA, serviceB }) {
   return <div />;
 }
 
-AppServiceObj.dependencies = { serviceA: 'AServiceKey', serviceB: 'BServiceKey' };
+AppServiceObj.dependencies = {
+  serviceA: 'AServiceKey',
+  serviceB: 'BServiceKey',
+};
 
 export const WrappedAppServiceObj = withServices(AppServiceObj);
 ```
