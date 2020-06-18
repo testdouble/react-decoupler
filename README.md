@@ -2,7 +2,7 @@
 
 ## Overview
 
-React Decoupler is a super, simple dependency injection utility designed to help
+React Decoupler is a simple dependency injection utility designed to help
 you decouple your React components from outside concerns and make it easier to
 reuse, refactor, and test your code.
 
@@ -20,9 +20,244 @@ data structure passed down via React Context that maps "service keys" to "servic
 all wrapped in an ergonomic API with a bunch of helpful react-specific hooks and
 components to make accessing it easier.
 
-### Examples
+Why would you use this? Because you are too lazy (in a good way), to write the
+few hundred lines of glue code and tests to provide the same, simple API.
+
+
+### Example
 
 ```javascript
+// index.js
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { InjectorProvider } from 'react-decoupler';
+import { injector } from './services';
+import { App } from './App;
+
+ReactDOM.render(
+  <InjectorProvider injector={injector}>
+    <App />
+  </InjectorProvider>,
+  document.getElementById('app')
+);
+```
+
+```javascript
+// services.js
+
+import { ServiceInjector, Lookup } from 'react-decoupler';
+import axios from 'axios';
+
+export const injector = new ServiceInjector();
+
+export class APIClient {
+  constructor(axiosClient, defaultPageLength) {
+    this.axios = axiosClient;
+    this.defaultPageLength = defaultPageLength;
+  }
+
+  async listVehicles() {
+    const resp = await this.axios.get(
+      `/vehicles?per_page=${this.defaultPageLength}`
+    );
+    return resp.data;
+  }
+
+  async getVehicle(id) {
+    const resp = await this.axios.get(`/vehicles/${id}`);
+    return resp.data;
+  }
+}
+
+export function calculateVehicleRange(vehicle) {
+  return vehicle.remainingFuel * vehicle.gasMileage;
+}
+
+export async function currentLocation() {
+  return [0, 0]; // Perform GPS location lookup
+}
+
+export class TripManager {
+  calculateArrival(start, end) {
+    // perform magic calculation
+  }
+}
+
+// NOTE: Order of registration doesn't matter as long all of a service's
+//       dependencies have been registered by the time it is resolved.
+
+injector.register('currentLocation', currentLocation);
+injector.register('vehicle.calculateRange', calculateVehicleRange);
+
+injector.register('TripManager', TripManager, {
+  // When resolved, injector will call `new TripManager()`
+  asInstance: true,
+});
+
+injector.register('APIClient', APIClient, {
+  // injector will bind the following params to the constructor
+  withParams: [
+    // When resolved, injector will pass whatever was registered with the
+    // key "axios" as the first arg it's constructor
+    Lookup('axios'),
+
+    // Example of passing a static value
+    100,
+  ],
+});
+
+injector.register(
+  'axios',
+  axios.create({
+    /* custom params */
+  })
+);
+```
+
+```javascript
+// App.js
+
+import React from 'react';
+import { useServices } from 'react-decoupler';
+
+export function App() {
+  const [APIClient] = useServices(['APIClient']);
+  const [vehicles, setVehicles] = React.useState([]);
+
+  React.useEffect(() => {
+    const apiClient = new APIClient(); // constructor args already bound;
+    apiClient.listVehicles().then(apiVehicles => {
+      setVehicles(apiVehicles);
+    });
+  }, [APIClient]); // APIClient will be consistent each render
+
+  return (
+    <div>
+      {vehicles.map(vehicle => (
+        <VehicleDashboard vehicle={vehicle} />
+      ))}
+    </div>
+  );
+}
+
+export function VehicleDashboard({ vehicle }) {
+  const [arrivalTime, setArrivalTime] = React.useState();
+  const [calculateRange, tripManager] = useServices([
+    'vehicle.calculateRange',
+    'currentLocation',
+    'TripManager', // will be a new instance each render
+  ]);
+
+  return (
+    <div>
+      <div>
+        {vehicle.year} {vehicle.make} {vehicle.model}
+      </div>
+      <div>Range: {calculateRange(vehicle)}</div>
+      <div>Arrival Time: {arrivalTime}</div>
+
+      <button
+        onClick={() => {
+          currentLocation().then(myCoordinates => {
+            const estimatedArrival = tripManager.calculateArrival(
+              vehicle.lastLocation,
+              myCoordinates
+            );
+            setArrivalTime(estimatedArrival);
+          });
+        }}
+      >
+        Calculate Arrival
+      </button>
+    </div>
+  );
+}
+```
+
+```javascript
+// App.test.js
+
+import { InjectorProvider } from 'react-decoupler';
+import { render } from '@testing-library/react';
+import { App, VehicleDashboard } from './App';
+
+// WAT?! No Jest import mocks for our services?!
+
+describe('VehicleDashboard', () => {
+  it('makes test rendering super easy', () => {
+    const mockServices = {
+      'vehicle.calculateRange': jest.fn(),
+      currentLocation: jest.fn(),
+      TripManager: {
+        calculateArrival: jest.fn(),
+      },
+    };
+
+    const mockVehicle = {
+      make: 'Toyota',
+      model: 'Corolla',
+      year: '2020' /* .etc */,
+    };
+
+    render(
+      <InjectorProvider services={mockServices}>
+        <VehicleDashboard vehicle={testVehicle} />
+      </InjectorProvider>
+    );
+
+    // MAKE ASSERTIONS ON CALLS AND STUFF!
+  });
+});
+
+describe('App', () => {
+  it('makes even API requesting components trivial to test', () => {
+  const fakeApiData = {data: [/* fill with test vehicles */]}
+  const mockServices = {
+    APIClient: {
+      listVehicles: jest.fn().mockResolvedValue()
+    }
+  }
+    render(
+      <InjectorProvider services={mockServices}>
+        <App />
+      </InjectorProvider>
+    );
+  })
+```
+
+```javascript
+// services.test.js
+
+import { APIClient, calculateVehicleRange, TripManager } from './services;
+
+// WAT?! No jest import mocking of axios or any react things?!
+
+describe('APIClient', () => {
+  it('has never been so easy to test a service wrapping axios', async () => {
+    const mockAxios = {get: jest.fn().mockResolvedValue()};
+    const mockPageSize = 25;
+    const client = new APIClient(mockAxios, mockPageSize);
+
+    const vehicleListResult = await client.listVehicles();
+    expect(mockAxios.get).toBeCalledWith(`/vehicles?per_page${mockPageSize}`)
+
+    const vehicleResult = await client.getVehicle(1);
+    expect(mockAxios.get).toBeCalledWith(`/vehicles/1`)
+  });
+});
+
+describe('TripManager', () => {
+  it('is trivial', () => {
+    /* write your test */
+  });
+});
+
+describe('calculateVehicleRange', () => {
+  it('is trivial', () => {
+    /* write your test */
+  });
+});
 
 ```
 
@@ -48,12 +283,13 @@ class ServiceInjector
 
   - `withParams: Array<any>`: Binds the given array of parameters as
     arguments to the service (value of the service must be a callable that
-    supports `.bind()`). The binding happens at resolve-time and is
+    supports `.bind()`). The binding happens at first-resolve-time and is
     consistent between calls. Use in conjunction with the `Lookup` function
     if you want to bind to services in the Injector. Defaults to undefined.
 
-  - `asInstance: boolean`: When true, the injector will call `new` on
-    the service value when resolving it. Defaults to false.
+  - `asInstance: boolean`: When true, the injector will call `new` on the
+    service value when resolving it. Will return a new instance _every call_.
+    Defaults to false.
 
 - `resolve(dependencies: {} | [])`: Accepts an array or object of service keys
   and returns a matching collection of resolved services.
