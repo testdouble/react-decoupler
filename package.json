@@ -1,5 +1,5 @@
 {
-  "name": "react-entangle",
+  "name": "react-decoupler",
   "version": "0.1.0",
   "author": "Tommy Groshong <tom@groshong.software> (https://tommygroshong.com)",
   "description": "Simple Dependency Injection for React",
@@ -9,14 +9,14 @@
     "dependency injection"
   ],
   "main": "index.js",
-  "module": "dist/react-entangle.mjs",
+  "module": "dist/react-decoupler.mjs",
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/testdouble/react-entangle",
-  "bugs": "https://github.com/testdouble/react-entangle/issues",
+  "homepage": "https://github.com/testdouble/react-decoupler",
+  "bugs": "https://github.com/testdouble/react-decoupler/issues",
   "repository": {
-    "url": "https://github.com/testdouble/react-entangle",
+    "url": "https://github.com/testdouble/react-decoupler",
     "type": "git"
   },
   "sideEffects": false,

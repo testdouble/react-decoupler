@@ -1,8 +1,17 @@
-# React Entangle
+# React Decoupler
 
-React Entangle is a super, simple dependency injection utility designed to help
+## Overview
+
+React Decoupler is a super, simple dependency injection utility designed to help
 you decouple your React components from outside concerns and make it easier to
 reuse, refactor, and test your code.
+
+### Installation
+
+- NPM: `npm install --save react-decoupler`
+- Yarn: `yarn add react-decoupler`
+
+### Explanation
 
 How simple is it? RIDICULOUSLY SIMPLE! No Really. Honestly, it's essentially
 just a [JavaScript
@@ -11,14 +20,11 @@ data structure passed down via React Context that maps "service keys" to "servic
 all wrapped in an ergonomic API with a bunch of helpful react-specific hooks and
 components to make accessing it easier.
 
-## Installation
+### Examples
 
-- NPM: `npm install --save react-entangle`
-- Yarn: `yarn add react-entangle`
+```javascript
 
-## Quick Start
-
-_TODO: coming soon_
+```
 
 ## API Reference
 
@@ -262,9 +268,9 @@ const WrappedApp = withServices(App);
 
 ## Contributing
 
-Development of React Entangle happens in the open on GitHub, and we are
+Development of React Decoupler happens in the open on GitHub, and we are
 grateful to the community for contributing bugfixes and improvements. Read below
-to learn how you can take part in improving React Entangle.
+to learn how you can take part in improving React Decoupler.
 
 _TODO: contributing help_
 
@@ -279,4 +285,4 @@ including blocking a user from the organization's repositories.
 
 ### License
 
-React Entangle is [MIT licensed](./LICENSE).
+React Decoupler is [MIT licensed](./LICENSE).
