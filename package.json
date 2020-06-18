@@ -1,5 +1,5 @@
 {
-  "name": "react-service-injector",
+  "name": "react-entangle",
   "version": "0.1.0",
   "author": "Tommy Groshong <tom@groshong.software> (https://tommygroshong.com)",
   "description": "Simple Dependency Injection for React",
@@ -9,14 +9,14 @@
     "dependency injection"
   ],
   "main": "index.js",
-  "module": "dist/react-service-injector.mjs",
+  "module": "dist/react-entangle.mjs",
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/testdouble/react-service-injector",
-  "bugs": "https://github.com/testdouble/react-service-injectorissues",
+  "homepage": "https://github.com/testdouble/react-entangle",
+  "bugs": "https://github.com/testdouble/react-entangle/issues",
   "repository": {
-    "url": "https://github.com/testdouble/react-service-injector",
+    "url": "https://github.com/testdouble/react-entangle",
     "type": "git"
   },
   "sideEffects": false,
