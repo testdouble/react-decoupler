@@ -57,20 +57,10 @@ export const injector = new ServiceInjector();
 
 injector.register('currentLocation', currentLocation);
 injector.register('vehicle.calculateRange', calculateVehicleRange);
-
 injector.register('TripManager', TripManager, {
   // When resolved, injector will call `new TripManager()`
   asInstance: true,
 });
-
-// By registering external dependencies in the Injector, components and other
-// services don't need to import them directly. This makes it very easy to (a)
-// test modules in isolation by filling an injector with mocked dependencies (b)
-// swap out dependencies in different parts of the app without updating imports
-
-injector.register('axios', axios.create({ /* custom params */ }));
-
-
 injector.register('APIClient', APIClient, {
   // injector will bind the following params to the constructor
   withParams: [
@@ -80,6 +70,13 @@ injector.register('APIClient', APIClient, {
     100, // Example of passing a static value
   ],
 });
+
+// By registering external dependencies in the Injector, components and other
+// services don't need to import them directly. This makes it very easy to (a)
+// test modules in isolation by filling an injector with mocked dependencies (b)
+// swap out dependencies in different parts of the app without updating imports
+
+injector.register('axios', axios.create({ /* custom params */ }));
 
 /* START --- Contrived Example Code */
 export class APIClient {
