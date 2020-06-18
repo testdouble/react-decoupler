@@ -28,7 +28,7 @@ export const Lookup = value => {
 /**
  * Core implementation for a ServiceInjector.
  */
-export default class ServiceInjector {
+export class ServiceInjector {
   static fromServices(services) {
     const loc = new ServiceInjector();
     Object.keys(services).forEach(serviceKey => {

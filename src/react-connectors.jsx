@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import hoistNonReactStatics from 'hoist-non-react-statics';
-import ServiceInjector from './ServiceInjector';
+import { ServiceInjector } from './ServiceInjector';
 
 const InjectorContext = React.createContext();
 
@@ -11,7 +11,7 @@ const InjectorContext = React.createContext();
  * @usage:
  *
  *     // With Injector instance
- *     <InjectorProvider injector={serviceInjectorInstance}>
+ *     <InjectorProvider injector={injectorInstance}>
  *       <YourApp />
  *     </InjectorProvider
  *
@@ -116,17 +116,17 @@ export class InjectServices extends React.Component {
 }
 
 /**
- * @name: useServiceInjector
+ * @name: useInjector
  * @description: Hook to return the Injector from context.
  * @usage:
  *
  *     const App = () => {
- *       const injector = useServiceInjector()
+ *       const injector = useInjector()
  *       const [A] = injector.resolve(['A'])
  *       return <div />
  *     }
  */
-export const useServiceInjector = () => {
+export const useInjector = () => {
   if (!React.useContext) {
     throw new Error(
       'Hooks not found on React. Are you using React v16.8 or greater?'
@@ -152,6 +152,6 @@ export const useServiceInjector = () => {
  *     }
  */
 export const useServices = deps => {
-  const injector = useServiceInjector();
+  const injector = useInjector();
   return injector.resolve(deps);
 };

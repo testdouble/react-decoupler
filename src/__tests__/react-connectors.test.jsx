@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import ServiceInjector from '../ServiceInjector.js';
+import { ServiceInjector } from '../ServiceInjector.js';
 import {
   InjectorProvider,
   withServices,
   InjectServices,
-  useServiceInjector,
+  useInjector,
   useServices,
 } from '../react-connectors.jsx';
 
@@ -144,7 +144,7 @@ describe('<InjectServices /> render prop component', () => {
 describe('useServicesInjector()', () => {
   it('returns default injector', () => {
     const App = () => {
-      const loc = useServiceInjector();
+      const loc = useInjector();
       expect(loc).toBeInstanceOf(ServiceInjector);
       return 'default';
     };
@@ -159,7 +159,7 @@ describe('useServicesInjector()', () => {
   it('returns created injector', () => {
     const injector = new ServiceInjector();
     const App = () => {
-      const loc = useServiceInjector();
+      const loc = useInjector();
       expect(loc).toBe(injector);
       return 'default';
     };
@@ -173,7 +173,7 @@ describe('useServicesInjector()', () => {
 
   it('throws if not wrapped in provider', () => {
     const App = () => {
-      useServiceInjector();
+      useInjector();
       return 'default';
     };
 

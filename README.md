@@ -1,4 +1,4 @@
-React Service Injector
+React Entangle
 ===========================
 
 _TODO: overview_
@@ -6,8 +6,8 @@ _TODO: overview_
 ## Installation
 
 _TODO: make real_
-* NPM: `npm install --save react-service-injector`
-* Yarn: `yarn add react-service-injector`
+* NPM: `npm install --save react-entangle`
+* Yarn: `yarn add react-entangle`
 
 ## Examples
 
@@ -20,9 +20,9 @@ _TODO: reference docs_
 
 ## Contributing
 
-Development of React Service Injector happens in the open on GitHub, and we are
+Development of React Entangle happens in the open on GitHub, and we are
 grateful to the community for contributing bugfixes and improvements. Read below
-to learn how you can take part in improving React Service Injector.
+to learn how you can take part in improving React Entangle.
 
 _TODO: contributing help_
 
@@ -37,4 +37,4 @@ including blocking a user from the organization's repositories.
 
 ### License
 
-React Service Injector is [MIT licensed](./LICENSE).
+React Entangle is [MIT licensed](./LICENSE).

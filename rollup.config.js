@@ -5,8 +5,8 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 
-const PACKAGE_NAME = 'ReactServiceInjector';
-const FILE_BASE_NAME = 'react-service-injector';
+const PACKAGE_NAME = 'ReactEntangle';
+const FILE_BASE_NAME = 'react-entangle';
 
 const external = ['react', 'prop-types'];
 const globals = {

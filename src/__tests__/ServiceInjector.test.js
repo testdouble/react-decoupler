@@ -1,4 +1,4 @@
-import ServiceInjector, { Lookup as L } from '../ServiceInjector.js';
+import { ServiceInjector, Lookup as L } from '../ServiceInjector';
 
 describe('ServiceInjector', () => {
   let injector;
