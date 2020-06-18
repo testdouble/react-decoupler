@@ -23,7 +23,6 @@ components to make accessing it easier.
 Why would you use this? Because you are too lazy (in a good way), to write the
 few hundred lines of glue code and tests to provide the same, simple API.
 
-
 ### Example
 
 ```javascript
@@ -143,7 +142,7 @@ export function App() {
 
 export function VehicleDashboard({ vehicle }) {
   const [arrivalTime, setArrivalTime] = React.useState();
-  const [calculateRange, tripManager] = useServices([
+  const [calculateRange, currentLocation, tripManager] = useServices([
     'vehicle.calculateRange',
     'currentLocation',
     'TripManager', // will be a new instance each render
