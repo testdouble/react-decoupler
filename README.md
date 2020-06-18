@@ -151,9 +151,13 @@ const injector = new ServiceInjector();
 
 injector.register('ServiceKey', MyService);
 
-<InjectorProvider injector={injectorInstance}>
-  <YourApp />
-</InjectorProvider
+function App() {
+  return (
+    <InjectorProvider injector={injectorInstance}>
+      <YourApp />
+    </InjectorProvider
+  )
+}
 ```
 
 Or with a "Services" mapping object.
