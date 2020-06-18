@@ -20,8 +20,8 @@ data structure passed down via React Context that maps "service keys" to "servic
 all wrapped in an ergonomic API with a bunch of helpful react-specific hooks and
 components to make accessing it easier.
 
-Why would you use this? Because you are too lazy (in a good way), to write the
-few hundred lines of glue code and tests to provide the same, simple API.
+Why would you use this? Maybe because you are too busy to write the few hundred
+lines of glue code and tests to provide the same, simple API.
 
 ### Examples
 
@@ -33,8 +33,8 @@ import ReactDOM from 'react-dom';
 import { InjectorProvider, useServices } from 'react-decoupler';
 
 const serviceMap = {
-  helloworld: name => `Hello, ${name ? name : 'World'}!`
-}
+  helloworld: name => `Hello, ${name ? name : 'World'}!`,
+};
 
 function App() {
   const [getGreeting] = useServices(['helloWorld']);
