@@ -141,7 +141,7 @@ describe('<InjectServices /> render prop component', () => {
   });
 });
 
-describe('useServicesInjector()', () => {
+describe('useInjector()', () => {
   it('returns default injector', () => {
     const App = () => {
       const loc = useInjector();
