@@ -30,14 +30,11 @@ few hundred lines of glue code and tests to provide the same, simple API.
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  ServiceInjector,
-  InjectorProvider,
-  useServices,
-} from 'react-decoupler';
+import { InjectorProvider, useServices } from 'react-decoupler';
 
-const injector = new ServiceInjector();
-injector.register('helloworld', name => `Hello, ${name ? name : 'World'}!`);
+const serviceMap = {
+  helloworld: name => `Hello, ${name ? name : 'World'}!`
+}
 
 function App() {
   const [getGreeting] = useServices(['helloWorld']);
@@ -50,7 +47,7 @@ function App() {
 }
 
 ReactDOM.render(
-  <InjectorProvider injector={injector}>
+  <InjectorProvider services={serviceMap}>
     <App />
   </InjectorProvider>,
   document.getElementById('app')
