@@ -48,8 +48,40 @@ ReactDOM.render(
 import { ServiceInjector, Lookup } from 'react-decoupler';
 import axios from 'axios';
 
+// The injector will register your services and get passed down through
+// React context to be used by our components
 export const injector = new ServiceInjector();
 
+// NOTE: Order of registration doesn't matter as long all of a service's
+//       dependencies have been registered by the time it is resolved.
+
+injector.register('currentLocation', currentLocation);
+injector.register('vehicle.calculateRange', calculateVehicleRange);
+
+injector.register('TripManager', TripManager, {
+  // When resolved, injector will call `new TripManager()`
+  asInstance: true,
+});
+
+// By registering external dependencies in the Injector, components and other
+// services don't need to import them directly. This makes it very easy to (a)
+// test modules in isolation by filling an injector with mocked dependencies (b)
+// swap out dependencies in different parts of the app without updating imports
+
+injector.register('axios', axios.create({ /* custom params */ }));
+
+
+injector.register('APIClient', APIClient, {
+  // injector will bind the following params to the constructor
+  withParams: [
+    // When resolved, injector will pass whatever was registered with the
+    // key "axios" as the first arg it's constructor
+    Lookup('axios'),
+    100, // Example of passing a static value
+  ],
+});
+
+/* START --- Contrived Example Code */
 export class APIClient {
   constructor(axiosClient, defaultPageLength) {
     this.axios = axiosClient;
@@ -82,36 +114,7 @@ export class TripManager {
     // perform magic calculation
   }
 }
-
-// NOTE: Order of registration doesn't matter as long all of a service's
-//       dependencies have been registered by the time it is resolved.
-
-injector.register('currentLocation', currentLocation);
-injector.register('vehicle.calculateRange', calculateVehicleRange);
-
-injector.register('TripManager', TripManager, {
-  // When resolved, injector will call `new TripManager()`
-  asInstance: true,
-});
-
-injector.register('APIClient', APIClient, {
-  // injector will bind the following params to the constructor
-  withParams: [
-    // When resolved, injector will pass whatever was registered with the
-    // key "axios" as the first arg it's constructor
-    Lookup('axios'),
-
-    // Example of passing a static value
-    100,
-  ],
-});
-
-injector.register(
-  'axios',
-  axios.create({
-    /* custom params */
-  })
-);
+/* END --- Contrived Example Code */
 ```
 
 ```javascript
@@ -214,7 +217,7 @@ describe('App', () => {
   const fakeApiData = {data: [/* fill with test vehicles */]}
   const mockServices = {
     APIClient: {
-      listVehicles: jest.fn().mockResolvedValue()
+      listVehicles: jest.fn().mockResolvedValue(fakeApiData)
     }
   }
     render(
