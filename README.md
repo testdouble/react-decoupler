@@ -13,7 +13,7 @@ reuse, refactor, and test your code.
 
 ### Explanation
 
-How simple is it? RIDICULOUSLY SIMPLE! No Really. Honestly, it's essentially
+How simple is it? RIDICULOUSLY SIMPLE! No Really. It's essentially
 just a [JavaScript
 Map()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
 data structure passed down via React Context that maps "service keys" to "services",
