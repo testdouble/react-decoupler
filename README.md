@@ -462,7 +462,7 @@ Render Prop component for injecting services.
 function App() {
   return (
     <InjectServices deps={['funcKey', 'ServiceClass', 'val']}>
-      {({ func, ServiceClas, val }) => {
+      {([ func, ServiceClas, val ]) => {
         return <div />;
       }}
     </InjectServices>
@@ -476,29 +476,25 @@ Higher-order Component for injecting services as props.
 
 #### Usage
 
-Array service resolution keys:
-
 ```javascript
-function App({ services }) {
+// Array service resolution keys:
+function AppServiceArray({ services }) {
   const [serviceA, serviceB] = services;
   return <div />;
 }
 
-App.dependencies = ['AServiceKey', 'BServiceKey'];
+AppServiceArray.dependencies = ['AServiceKey', 'BServiceKey'];
+export const WrappedAppServiceArray = withServices(AppServiceArray);
 
-const WrappedApp = withServices(App);
-```
 
-Object service resolution keys:
-
-```javascript
-function App({ serviceA, serviceB }) {
+// Object service resolution keys:
+function AppServiceObj({ serviceA, serviceB }) {
   return <div />;
 }
 
-App.dependencies = { serviceA: 'AServiceKey', serviceB: 'BServiceKey' };
+AppServiceObj.dependencies = { serviceA: 'AServiceKey', serviceB: 'BServiceKey' };
 
-const WrappedApp = withServices(App);
+export const WrappedAppServiceObj = withServices(AppServiceObj);
 ```
 
 ## Contributing
