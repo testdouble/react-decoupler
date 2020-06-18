@@ -10,6 +10,7 @@ dist
 artifacts
 .rpt2_cache
 coverage
+.log
 
 # misc
 .DS_Store
