@@ -35,27 +35,28 @@ class ServiceInjector
   static fromServices(services)
 ```
 
-- `fromServices(services)`: creates a ServiceInjector instance and fills it
-  with the services from the provided vanilla JS object. For each entry of the
-  services object, the key will become the "service key" and the value will
-  become the service value.
-
-- `register(key, service, options)`: Register a single service with a given
+- `register(key, service, options = {})`: Register a single service with a given
   key. Any value may be used as a key or a service. Supported options:
 
-  - `{ withParams: Array }`: Binds the given array of parameters as
+  - `withParams: Array<any>`: Binds the given array of parameters as
     arguments to the service (value of the service must be a callable that
     supports `.bind()`). The binding happens at resolve-time and is
     consistent between calls. Use in conjunction with the `Lookup` function
     if you want to bind to services in the Injector. Defaults to undefined.
 
-  - `{ asInstance: boolean }`: When true, the injector will call `new` on
+  - `asInstance: boolean`: When true, the injector will call `new` on
     the service value when resolving it. Defaults to false.
 
-- `resolve(dependencies)`: Accepts a collection (array or object) of service
-  keys and returns a matching collection of resolved services.
+- `resolve(dependencies: {} | [])`: Accepts an array or object of service keys
+  and returns a matching collection of resolved services.
+
   - When using an array of service keys, the order of the returned services will match with the keys.
   - When using an object of service keys, the name mapping is `{'name': 'ServiceKey'}`.
+
+- `static fromServices(services: {})`: Factory function to create a ServiceInjector
+  instance filled with the services from the provided vanilla JS object. Each
+  key-value entry of the service object becomes a registered service in the
+  injector.
 
 #### Usage
 
@@ -108,10 +109,9 @@ service with that key during resolution.
 #### Usage
 
 ```javascript
-
-function foo(bar, instanceBar) {
-  console.assert(typeof bar === 'string' && bar === 'Bar');
-  console.assert(instanceBar instanceof Bar);
+function foo(bar, iBar) {
+  console.assert(bar === 'Bar');
+  console.assert(iBar instanceof Bar);
 }
 
 class Bar {}
@@ -123,11 +123,11 @@ injector.register('Foo', foo, { withParams: ['Bar', Lookup('Bar')] });
 
 injector.register('Bar', Bar, { isInstance: true });
 
-const [ resolvedFoo ] = injector.resolve(['Foo']);
+const [resolvedFoo] = injector.resolve(['Foo']);
 resolvedFoo();
 ```
 
-### <InjectorProvider />
+### InjectorProvider
 
 React Context Provider. Wrap your components with this provider to enable the
 rest of the helper functions and components.
@@ -205,7 +205,7 @@ function App() {
 }
 ```
 
-### <InjectServices />
+### InjectServices
 
 Render Prop component for injecting services.
 
