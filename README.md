@@ -32,7 +32,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { InjectorProvider } from 'react-decoupler';
 import { injector } from './services';
-import { App } from './App;
+import { App } from './App';
 
 ReactDOM.render(
   <InjectorProvider injector={injector}>
@@ -228,7 +228,7 @@ describe('App', () => {
 ```javascript
 // services.test.js
 
-import { APIClient, calculateVehicleRange, TripManager } from './services;
+import { APIClient, calculateVehicleRange, TripManager } from './services';
 
 // WAT?! No jest import mocking of axios or any react things?!
 
