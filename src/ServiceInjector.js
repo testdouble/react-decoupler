@@ -43,10 +43,9 @@ export class ServiceInjector {
   }
 
   register(key, service, options = {}) {
-    assertInDev(
-      !this._deps.has(key),
-      `Service key already used: ${toString(key)}`
-    );
+    if (this._deps.has(key) && !options.allowOverwrite) {
+      throw new Error(`Service key already used: ${toString(key)}`);
+    }
 
     if (options.withParams && typeof service !== 'function') {
       throw new Error(

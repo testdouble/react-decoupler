@@ -315,6 +315,10 @@ class ServiceInjector
 - `register(key, service, options = {})`: Register a single service with a given
   key. Any value may be used as a key or a service. Supported options:
 
+  - `allowOverwrite: Boolean`: When true, will replace any existing service
+    registration using the same key. An error is thrown if a key is already
+    registered and then a client attempts to re-register without this option.
+
   - `withParams: Array<any>`: Binds the given array of parameters as
     arguments to the service (value of the service must be a callable that
     supports `.bind()`). The binding happens at first-resolve-time and is

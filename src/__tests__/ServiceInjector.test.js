@@ -45,11 +45,16 @@ describe('ServiceInjector', () => {
     ).toEqual({ SimpleB: B, ComplexA: A });
   });
 
-  it('throws when adding duplicate key', () => {
+  it('throws when adding duplicate key without allowOverwrite option', () => {
     injector.register('val', 123);
+
     expect(() => {
       injector.register('val', 456);
     }).toThrow();
+
+    expect(() => {
+      injector.register('val', 456, { allowOverwrite: true });
+    }).not.toThrow();
   });
 
   it('throws when locating a missing key', () => {
