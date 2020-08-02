@@ -213,4 +213,45 @@ describe('ServiceInjector', () => {
     expect(immValObjRef).toBe(immutableValObj);
     expect(boolArg).toBe(true);
   });
+
+  it('clears dependency cache of bound lookups', () => {
+    class A {}
+    function bFunc(AClass) {
+      return AClass;
+    }
+    class C {
+      constructor(...args) {
+        this.constructorArgs = args;
+      }
+    }
+    class OtherA {}
+
+    injector.register('A', A);
+    injector.register('bFunc', bFunc, {
+      asInstance: false,
+      withParams: [L('A')],
+    });
+    injector.register('CStaticBound', C, {
+      asInstance: false,
+      withParams: [L('A')],
+    });
+
+    const [resolvedBFunc, resolvedCStaticBound] = injector.resolve([
+      'bFunc',
+      'CStaticBound',
+    ]);
+
+    injector.clearDependencyCache();
+    injector.register('A', OtherA, { allowOverwrite: true });
+
+    const [resolvedBFunc2nd, resolvedCStaticBound2nd] = injector.resolve([
+      'bFunc',
+      'CStaticBound',
+    ]);
+
+    expect(resolvedBFunc()).toBe(A);
+    expect(resolvedBFunc2nd()).toBe(OtherA);
+    expect(resolvedBFunc2nd).not.toBe(resolvedBFunc);
+    expect(resolvedCStaticBound2nd).not.toBe(resolvedCStaticBound);
+  });
 });

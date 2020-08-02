@@ -42,6 +42,10 @@ export class ServiceInjector {
     this._boundLookups = new Map();
   }
 
+  clearDependencyCache() {
+    this._boundLookups = new Map();
+  }
+
   register(key, service, options = {}) {
     if (this._deps.has(key) && !options.allowOverwrite) {
       throw new Error(`Service key already used: ${toString(key)}`);

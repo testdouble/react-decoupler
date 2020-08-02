@@ -306,11 +306,18 @@ A JavaScript Class that implements service registration and resolution.
 ```
 class ServiceInjector
 
+  static fromServices(services)
+
   register(key, service, options)
   resolve(dependencies)
+  clearDependencyCache()
 
-  static fromServices(services)
 ```
+
+- `static fromServices(services: {})`: Factory function to create a ServiceInjector
+  instance filled with the services from the provided vanilla JS object. Each
+  key-value entry of the service object becomes a registered service in the
+  injector.
 
 - `register(key, service, options = {})`: Register a single service with a given
   key. Any value may be used as a key or a service. Supported options:
@@ -329,16 +336,23 @@ class ServiceInjector
     service value when resolving it. Will return a new instance _every call_.
     Defaults to false.
 
+
 - `resolve(dependencies: {} | [])`: Accepts an array or object of service keys
   and returns a matching collection of resolved services.
 
   - When using an array of service keys, the order of the returned services will match with the keys.
   - When using an object of service keys, the name mapping is `{'name': 'ServiceKey'}`.
 
-- `static fromServices(services: {})`: Factory function to create a ServiceInjector
-  instance filled with the services from the provided vanilla JS object. Each
-  key-value entry of the service object becomes a registered service in the
-  injector.
+- `clearDependencyCache()`: Clears the resolution cache of all parameter bound
+  services. When is this useful? If you are dynamically registering services
+  (e.g. calling `injector.register()` inside a component or function) and want
+  to force all future resolutions to forget the previous value of that
+  registered service key, call this method to delete the previously cached
+  services. The drawback to calling this function is that it forces certain
+  service functions/classes to resolve as new object references (i.e.
+  `useEffect` and `useMemo` that were relying on consistent reference in some
+  consumers will misbehave) so you need to be careful when you call it.
+
 
 #### Usage
 
