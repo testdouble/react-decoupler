@@ -2,15 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { InjectorProvider } from 'react-decoupler';
+import { DecouplerProvider } from 'react-decoupler';
 import * as serviceWorker from './serviceWorker';
-import { injector } from './services';
+import { locator } from './services';
 
 ReactDOM.render(
   <React.StrictMode>
-    <InjectorProvider injector={injector}>
+    <DecouplerProvider locator={locator}>
       <App />
-    </InjectorProvider>
+    </DecouplerProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

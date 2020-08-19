@@ -8,14 +8,14 @@ const assertInDev = (predicate, failureMessage) => {
 
 const toString = val => (!!val.toString ? val.toString() : val);
 
-const lookupSymbol = Symbol('Injector Lookup Symbol');
+const lookupSymbol = Symbol('Locator Lookup Symbol');
 /**
  * Factory function to tag a paramater indicating you want it looked up during resolution
  *
  * Usage:
  *
- *     injector.register('OtherServiceKey', OtherService)
- *     injector.register('MyServiceKey', MyService, {withParams: [Lookup('OtherServiceKey')]})
+ *     locator.register('OtherServiceKey', OtherService)
+ *     locator.register('MyServiceKey', MyService, {withParams: [Lookup('OtherServiceKey')]})
  *
  */
 export const Lookup = value => {
@@ -26,11 +26,11 @@ export const Lookup = value => {
 };
 
 /**
- * Core implementation for a ServiceInjector.
+ * Core implementation for a ServiceLocator.
  */
-export class ServiceInjector {
+export class ServiceLocator {
   static fromServices(services) {
-    const loc = new ServiceInjector();
+    const loc = new ServiceLocator();
     Object.keys(services).forEach(serviceKey => {
       loc.register(serviceKey, services[serviceKey]);
     });

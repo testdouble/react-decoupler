@@ -1,18 +1,18 @@
-import { ServiceInjector, Lookup as L } from '../ServiceInjector';
+import { ServiceLocator, Lookup as L } from '../ServiceLocator';
 
-describe('ServiceInjector', () => {
-  let injector;
+describe('ServiceLocator', () => {
+  let locator;
   beforeEach(() => {
-    injector = new ServiceInjector();
+    locator = new ServiceLocator();
   });
 
   it('returns a list of deps when given a list of keys', () => {
     class A {}
     class B {}
-    injector.register('A.super-complex-key', A);
-    injector.register('B', B);
+    locator.register('A.super-complex-key', A);
+    locator.register('B', B);
 
-    expect(injector.resolve(['A.super-complex-key', 'B'])).toEqual([A, B]);
+    expect(locator.resolve(['A.super-complex-key', 'B'])).toEqual([A, B]);
   });
 
   it('register supports strings, funcs, numbers, and symbols as keys', () => {
@@ -24,12 +24,12 @@ describe('ServiceInjector', () => {
     const BAR_KEY = Symbol('Bar symbol key');
     const BAZ_KEY = 1234;
     const QUX_KEY = () => {};
-    injector.register(FOO_KEY, Foo);
-    injector.register(BAR_KEY, Bar);
-    injector.register(BAZ_KEY, Baz);
-    injector.register(QUX_KEY, Qux);
+    locator.register(FOO_KEY, Foo);
+    locator.register(BAR_KEY, Bar);
+    locator.register(BAZ_KEY, Baz);
+    locator.register(QUX_KEY, Qux);
 
-    const resolvedVals = injector.resolve([FOO_KEY, BAR_KEY, BAZ_KEY, QUX_KEY]);
+    const resolvedVals = locator.resolve([FOO_KEY, BAR_KEY, BAZ_KEY, QUX_KEY]);
 
     expect(resolvedVals).toEqual([Foo, Bar, Baz, Qux]);
   });
@@ -37,67 +37,67 @@ describe('ServiceInjector', () => {
   it('returns an object of deps keyed by name when given a key->name object', () => {
     class A {}
     class B {}
-    injector.register('A', A);
-    injector.register('B.super-complex-key', B);
+    locator.register('A', A);
+    locator.register('B.super-complex-key', B);
 
     expect(
-      injector.resolve({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
+      locator.resolve({ 'B.super-complex-key': 'SimpleB', A: 'ComplexA' })
     ).toEqual({ SimpleB: B, ComplexA: A });
   });
 
   it('throws when adding duplicate key without allowOverwrite option', () => {
-    injector.register('val', 123);
+    locator.register('val', 123);
 
     expect(() => {
-      injector.register('val', 456);
+      locator.register('val', 456);
     }).toThrow();
 
     expect(() => {
-      injector.register('val', 456, { allowOverwrite: true });
+      locator.register('val', 456, { allowOverwrite: true });
     }).not.toThrow();
   });
 
   it('throws when locating a missing key', () => {
-    injector.register('val', 123);
+    locator.register('val', 123);
     expect(() => {
-      injector.resolve(['unknown']);
+      locator.resolve(['unknown']);
     }).toThrow();
   });
 
   it('throws when locating with not an array or object', () => {
     expect(() => {
-      injector.resolve(123);
+      locator.resolve(123);
     }).toThrow();
 
     expect(() => {
-      injector.resolve('unsupported string');
+      locator.resolve('unsupported string');
     }).toThrow();
 
     expect(() => {
-      injector.resolve(null);
+      locator.resolve(null);
     }).toThrow();
 
     expect(() => {
-      injector.resolve(true);
+      locator.resolve(true);
     }).toThrow();
 
     expect(() => {
-      injector.resolve([]);
+      locator.resolve([]);
     }).not.toThrow();
 
     expect(() => {
-      injector.resolve({});
+      locator.resolve({});
     }).not.toThrow();
   });
 
   it('registers service with setting to instantiate it when resolved', () => {
     class A {}
     class B {}
-    injector.register('A', A);
-    injector.register('B', B, { asInstance: true });
+    locator.register('A', A);
+    locator.register('B', B, { asInstance: true });
 
-    const arrResult = injector.resolve(['A', 'B']);
-    const objResult = injector.resolve({ A: 'A', B: 'b' });
+    const arrResult = locator.resolve(['A', 'B']);
+    const objResult = locator.resolve({ A: 'A', B: 'b' });
 
     expect(arrResult[0]).toBe(A);
     expect(arrResult[1]).toBeInstanceOf(B);
@@ -118,14 +118,14 @@ describe('ServiceInjector', () => {
         this.constructorArgs = args;
       }
     }
-    injector.register('A', A);
-    injector.register('B', B, {
+    locator.register('A', A);
+    locator.register('B', B, {
       asInstance: true,
       withParams: [L('A'), L('C')],
     });
-    injector.register('C', C, { asInstance: true, withParams: [L('A')] });
+    locator.register('C', C, { asInstance: true, withParams: [L('A')] });
 
-    const [bInstance] = injector.resolve(['B']);
+    const [bInstance] = locator.resolve(['B']);
 
     expect(bInstance.constructorArgs.length).toEqual(2);
 
@@ -146,21 +146,21 @@ describe('ServiceInjector', () => {
       }
     }
 
-    injector.register('A', A);
-    injector.register('bFunc', bFunc, {
+    locator.register('A', A);
+    locator.register('bFunc', bFunc, {
       asInstance: false,
       withParams: [L('A')],
     });
-    injector.register('CStaticBound', C, {
+    locator.register('CStaticBound', C, {
       asInstance: false,
       withParams: [L('A')],
     });
 
-    const [resolvedBFunc, resolvedCStaticBound] = injector.resolve([
+    const [resolvedBFunc, resolvedCStaticBound] = locator.resolve([
       'bFunc',
       'CStaticBound',
     ]);
-    const [resolvedBFunc2nd, resolvedCStaticBound2nd] = injector.resolve([
+    const [resolvedBFunc2nd, resolvedCStaticBound2nd] = locator.resolve([
       'bFunc',
       'CStaticBound',
     ]);
@@ -176,15 +176,15 @@ describe('ServiceInjector', () => {
 
   it('throws if register called withParams for a non-callable', () => {
     expect(() => {
-      injector.register('MyNotFunc', 1234321, { withParams: ['A'] });
+      locator.register('MyNotFunc', 1234321, { withParams: ['A'] });
     }).toThrow();
 
     expect(() => {
-      injector.register('MyFunc', () => {}, { withParams: ['A'] });
+      locator.register('MyFunc', () => {}, { withParams: ['A'] });
     }).not.toThrow();
 
     expect(() => {
-      injector.register('MyClass', class Bob {}, { withParams: ['A'] });
+      locator.register('MyClass', class Bob {}, { withParams: ['A'] });
     }).not.toThrow();
   });
 
@@ -197,13 +197,13 @@ describe('ServiceInjector', () => {
     class Bar {}
 
     const immutableValObj = Object.freeze({ thingy: 'myvalue' });
-    injector.register('Foo', Foo, {
+    locator.register('Foo', Foo, {
       asInstance: true,
       withParams: [L('Bar'), 'Bar', immutableValObj, true],
     });
-    injector.register('Bar', Bar);
+    locator.register('Bar', Bar);
 
-    const [fooInstance] = injector.resolve(['Foo']);
+    const [fooInstance] = locator.resolve(['Foo']);
 
     expect(fooInstance).toBeInstanceOf(Foo);
     expect(fooInstance.constructorArgs.length).toEqual(4);
@@ -226,25 +226,25 @@ describe('ServiceInjector', () => {
     }
     class OtherA {}
 
-    injector.register('A', A);
-    injector.register('bFunc', bFunc, {
+    locator.register('A', A);
+    locator.register('bFunc', bFunc, {
       asInstance: false,
       withParams: [L('A')],
     });
-    injector.register('CStaticBound', C, {
+    locator.register('CStaticBound', C, {
       asInstance: false,
       withParams: [L('A')],
     });
 
-    const [resolvedBFunc, resolvedCStaticBound] = injector.resolve([
+    const [resolvedBFunc, resolvedCStaticBound] = locator.resolve([
       'bFunc',
       'CStaticBound',
     ]);
 
-    injector.clearDependencyCache();
-    injector.register('A', OtherA, { allowOverwrite: true });
+    locator.clearDependencyCache();
+    locator.register('A', OtherA, { allowOverwrite: true });
 
-    const [resolvedBFunc2nd, resolvedCStaticBound2nd] = injector.resolve([
+    const [resolvedBFunc2nd, resolvedCStaticBound2nd] = locator.resolve([
       'bFunc',
       'CStaticBound',
     ]);

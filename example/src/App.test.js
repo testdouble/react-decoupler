@@ -1,5 +1,5 @@
 import React from 'react';
-import { InjectorProvider } from 'react-decoupler';
+import { DecouplerProvider } from 'react-decoupler';
 import { render, wait } from '@testing-library/react';
 import { App, VehicleDashboard } from './App';
 
@@ -22,9 +22,9 @@ describe('VehicleDashboard', () => {
     };
 
     render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <VehicleDashboard vehicle={testVehicle} />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
 
     // MAKE ASSERTIONS ON CALLS AND STUFF!
@@ -48,7 +48,7 @@ describe('App', () => {
     }
 
     render(
-      <InjectorProvider
+      <DecouplerProvider
         services={{
           APIClient,
           currentLocation: jest.fn().mockReturnValue([1, 2]),
@@ -57,7 +57,7 @@ describe('App', () => {
         }}
       >
         <App />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
 
     // TODO: make your assertions!

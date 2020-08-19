@@ -1,9 +1,9 @@
-import { ServiceInjector, Lookup } from 'react-decoupler';
+import { ServiceLocator, Lookup } from 'react-decoupler';
 import axios from 'axios';
 
-// The injector will register your services and get passed down through
+// The locator will register your services and get passed down through
 // React context to be used by our components
-export const injector = new ServiceInjector();
+export const locator = new ServiceLocator();
 
 // NOTE: Order of registration doesn't matter as long all of a service's
 //       dependencies have been registered by the time it is resolved.
@@ -43,17 +43,16 @@ export class TripManager {
 }
 /* END --- Contrived Example Code */
 
-
-injector.register('currentLocation', currentLocation);
-injector.register('vehicle.calculateRange', calculateVehicleRange);
-injector.register('TripManager', TripManager, {
-  // When resolved, injector will call `new TripManager()`
+locator.register('currentLocation', currentLocation);
+locator.register('vehicle.calculateRange', calculateVehicleRange);
+locator.register('TripManager', TripManager, {
+  // When resolved, locator will call `new TripManager()`
   asInstance: true,
 });
-injector.register('APIClient', APIClient, {
-  // injector will bind the following params to the constructor
+locator.register('APIClient', APIClient, {
+  // locator will bind the following params to the constructor
   withParams: [
-    // When resolved, injector will pass whatever was registered with the
+    // When resolved, locator will pass whatever was registered with the
     // key "axios" as the first arg it's constructor
     Lookup('axios'),
     100, // Example of passing a static value
@@ -62,10 +61,10 @@ injector.register('APIClient', APIClient, {
 
 // By registering external dependencies in the Injector, components and other
 // services don't need to import them directly. This makes it very easy to (a)
-// test modules in isolation by filling an injector with mocked dependencies (b)
+// test modules in isolation by filling an locator with mocked dependencies (b)
 // swap out dependencies in different parts of the app without updating imports
 
-injector.register(
+locator.register(
   'axios',
   axios.create({
     /* custom params */

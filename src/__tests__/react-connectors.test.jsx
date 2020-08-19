@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { ServiceInjector } from '../ServiceInjector.js';
+import { ServiceLocator } from '../ServiceLocator.js';
 import {
-  InjectorProvider,
+  DecouplerProvider,
   withServices,
-  InjectServices,
-  useInjector,
+  LocateServices,
+  useLocator,
   useServices,
 } from '../react-connectors.jsx';
 
@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 
 describe('withServices() HOC', () => {
-  it('passes dependency list result as an Arrapy prop named "services"', () => {
+  it('passes dependency list result as an array prop named "services"', () => {
     const App = props => {
       expect(props.services).toEqual([
         mockServices.func,
@@ -35,9 +35,9 @@ describe('withServices() HOC', () => {
 
     const WrappedApp = withServices(App);
     const { queryByText } = render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <WrappedApp />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
     expect(queryByText('done')).toBeInTheDocument();
   });
@@ -59,9 +59,9 @@ describe('withServices() HOC', () => {
 
     const WrappedApp = withServices(App);
     const { queryByText } = render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <WrappedApp />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
     expect(queryByText('done')).toBeInTheDocument();
   });
@@ -71,23 +71,23 @@ describe('withServices() HOC', () => {
 
     const WrappedApp = withServices(App);
     const { queryByText } = render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <WrappedApp />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
     expect(queryByText('done')).toBeInTheDocument();
   });
 });
 
-describe('<InjectServices /> render prop component', () => {
+describe('<LocateServices /> render prop component', () => {
   it('throws if not wrapped in provider', () => {
     const App = props => {
       return (
-        <InjectServices deps={['func', 'ServiceClass', 'val']}>
+        <LocateServices deps={['func', 'ServiceClass', 'val']}>
           {services => {
             return 'done';
           }}
-        </InjectServices>
+        </LocateServices>
       );
     };
     const oldError = console.error;
@@ -104,76 +104,76 @@ describe('<InjectServices /> render prop component', () => {
   it('passes declared dependencies as args to child render prop', () => {
     const App = props => {
       return (
-        <InjectServices deps={['func', 'ServiceClass', 'val']}>
+        <LocateServices deps={['func', 'ServiceClass', 'val']}>
           {([func, ServiceClass, val]) => {
             expect(func).toBe(mockServices.func);
             expect(ServiceClass).toBe(mockServices.ServiceClass);
             expect(val).toBe(mockServices.val);
             return 'done';
           }}
-        </InjectServices>
+        </LocateServices>
       );
     };
     render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <App />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
   });
 
   it('passes declared dependencies as args to child render prop', () => {
     const App = props => {
       return (
-        <InjectServices deps={{ func: 'NewNameFunc', val: 'NewVal' }}>
+        <LocateServices deps={{ func: 'NewNameFunc', val: 'NewVal' }}>
           {({ NewNameFunc, NewVal }) => {
             expect(NewNameFunc).toBe(mockServices.func);
             expect(NewVal).toBe(mockServices.val);
             return 'done';
           }}
-        </InjectServices>
+        </LocateServices>
       );
     };
     render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <App />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
   });
 });
 
-describe('useInjector()', () => {
-  it('returns default injector', () => {
+describe('useLocator()', () => {
+  it('returns default locator', () => {
     const App = () => {
-      const loc = useInjector();
-      expect(loc).toBeInstanceOf(ServiceInjector);
+      const loc = useLocator();
+      expect(loc).toBeInstanceOf(ServiceLocator);
       return 'default';
     };
 
     render(
-      <InjectorProvider services={{}}>
+      <DecouplerProvider services={{}}>
         <App />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
   });
 
-  it('returns created injector', () => {
-    const injector = new ServiceInjector();
+  it('returns created locator', () => {
+    const locator = new ServiceLocator();
     const App = () => {
-      const loc = useInjector();
-      expect(loc).toBe(injector);
+      const loc = useLocator();
+      expect(loc).toBe(locator);
       return 'default';
     };
 
     render(
-      <InjectorProvider injector={injector}>
+      <DecouplerProvider locator={locator}>
         <App />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
   });
 
   it('throws if not wrapped in provider', () => {
     const App = () => {
-      useInjector();
+      useLocator();
       return 'default';
     };
 
@@ -204,9 +204,9 @@ describe('useServices()', () => {
     };
 
     render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <App />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
   });
 
@@ -223,9 +223,9 @@ describe('useServices()', () => {
     };
 
     render(
-      <InjectorProvider services={mockServices}>
+      <DecouplerProvider services={mockServices}>
         <App />
-      </InjectorProvider>
+      </DecouplerProvider>
     );
   });
 });

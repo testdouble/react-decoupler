@@ -1,48 +1,48 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import hoistNonReactStatics from 'hoist-non-react-statics';
-import { ServiceInjector } from './ServiceInjector';
+import { ServiceLocator } from './ServiceLocator';
 
-const InjectorContext = React.createContext();
+const DecouplerContext = React.createContext();
 
 /**
- * @name: InjectorProvider
+ * @name: DecouplerProvider
  * @description: React Context Provider for library.
  * @usage:
  *
- *     // With Injector instance
- *     <InjectorProvider injector={injectorInstance}>
+ *     // With locator instance
+ *     <DecouplerProvider locator={locatorInstance}>
  *       <YourApp />
- *     </InjectorProvider
+ *     </DecouplerProvider
  *
  *     // OR With Services map
  *     const servicesMap = {
  *       'ServiceKey': Service
  *     }
- *     <InjectorProvider services={servicesMap}>
+ *     <DecouplerProvider services={servicesMap}>
  *       <YourApp />
- *     </InjectorProvider
+ *     </DecouplerProvider
  */
-export const InjectorProvider = ({ services, injector, value, children }) => {
-  if (!services && !injector) {
+export function DecouplerProvider({ services, locator, value, children }) {
+  if (!services && !locator) {
     throw new Error(
-      'Must provide services or injector prop to InjectorProvider.'
+      'Must provide services or locator prop to DecouplerProvider.'
     );
   }
 
-  const providerLocator = injector
-    ? injector
-    : ServiceInjector.fromServices(services);
+  const providerLocator = locator
+    ? locator
+    : ServiceLocator.fromServices(services);
   return (
-    <InjectorContext.Provider value={providerLocator}>
+    <DecouplerContext.Provider value={providerLocator}>
       {children}
-    </InjectorContext.Provider>
+    </DecouplerContext.Provider>
   );
-};
+}
 
 /**
  * @name: withServices
- * @description: Higher-order Component for injecting services as props.
+ * @description: Higher-order Component for locating services as props.
  * @usage:
  *
  *     const MyComponent = ({ServiceA, ServiceB}) => {
@@ -62,7 +62,7 @@ export const withServices = Component => {
 
   class C extends React.Component {
     static displayName = `withServices(${componentDisplayName})`;
-    static contextType = InjectorContext;
+    static contextType = DecouplerContext;
     render() {
       const staticDeps = Component.dependencies || [];
 
@@ -80,22 +80,22 @@ export const withServices = Component => {
 };
 
 /**
- * @name: InjectServices
- * @description: Render Prop component for injecting services.
+ * @name: LocateServices
+ * @description: Render Prop component for locating services.
  * @usage:
  *
  *     const App = () => {
  *       return (
- *         <InjectServices deps={['func', 'ServiceClass', 'val']}>
+ *         <LocateServices deps={['func', 'ServiceClass', 'val']}>
  *           {({func, ServiceClas, val}) => {
  *             return <div />
  *           }}
- *         </InjectServices>
+ *         </LocateServices>
  *       )
  *     }
  */
-export class InjectServices extends React.Component {
-  static contextType = InjectorContext;
+export class LocateServices extends React.Component {
+  static contextType = DecouplerContext;
 
   static propTypes = {
     children: PropTypes.func.isRequired,
@@ -106,38 +106,39 @@ export class InjectServices extends React.Component {
   };
 
   render() {
-    const injector = this.context;
-    if (!injector) {
-      throw new Error('Must be used inside a InjectorProvider');
+    const locator = this.context;
+    if (!locator) {
+      throw new Error('Must be used inside a DecouplerProvider');
     }
     const { children, deps } = this.props;
-    return children(injector.resolve(deps));
+    return children(locator.resolve(deps));
   }
 }
 
 /**
- * @name: useInjector
- * @description: Hook to return the Injector from context.
+ * @name: useLocator
+ * @description: Hook to return the locator from context.
  * @usage:
  *
  *     const App = () => {
- *       const injector = useInjector()
- *       const [A] = injector.resolve(['A'])
+ *       const locator = useLocator()
+ *       const [A] = locator.resolve(['A'])
  *       return <div />
  *     }
  */
-export const useInjector = () => {
+export function useLocator() {
   if (!React.useContext) {
     throw new Error(
       'Hooks not found on React. Are you using React v16.8 or greater?'
     );
   }
-  const injector = React.useContext(InjectorContext);
-  if (!injector) {
-    throw new Error('Must be used inside a InjectorProvider');
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const locator = React.useContext(DecouplerContext);
+  if (!locator) {
+    throw new Error('Must be used inside a DecouplerProvider');
   }
-  return injector;
-};
+  return locator;
+}
 
 /**
  * @name: useServices
@@ -151,7 +152,7 @@ export const useInjector = () => {
  *       return <div />
  *     }
  */
-export const useServices = deps => {
-  const injector = useInjector();
-  return injector.resolve(deps);
-};
+export function useServices(deps) {
+  const locator = useLocator();
+  return locator.resolve(deps);
+}

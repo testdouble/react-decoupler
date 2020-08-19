@@ -1,2 +1,2 @@
-export * from './ServiceInjector.js';
+export * from './ServiceLocator.js';
 export * from './react-connectors.jsx';

@@ -2,9 +2,9 @@
 
 ## Overview
 
-React Decoupler is a simple dependency injection utility designed to help
-you decouple your React components from outside concerns and make it easier to
-reuse, refactor, and test your code.
+React Decoupler is a simple dependency injection / service locator utility
+designed to help you decouple your React components from outside concerns and
+make it easier to reuse, refactor, and test your code.
 
 ### Installation
 
@@ -13,10 +13,8 @@ reuse, refactor, and test your code.
 
 ### Explanation
 
-How simple is it? RIDICULOUSLY SIMPLE! No Really. It's essentially
-just a [JavaScript
-Map()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
-data structure passed down via React Context that maps "service keys" to "services",
+How simple is it? RIDICULOUSLY SIMPLE! No Really. It's just a simple data
+structure passed down via React Context that maps "service keys" to "services",
 all wrapped in an ergonomic API with a bunch of helpful react-specific hooks and
 components to make accessing it easier.
 
@@ -30,7 +28,7 @@ lines of code, glue, and tests to provide the same behavior and helpful API.
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { InjectorProvider, useServices } from 'react-decoupler';
+import { DecouplerProvider, useServices } from 'react-decoupler';
 
 const serviceMap = {
   helloworld: name => `Hello, ${name ? name : 'World'}!`,
@@ -47,9 +45,9 @@ function App() {
 }
 
 ReactDOM.render(
-  <InjectorProvider services={serviceMap}>
+  <DecouplerProvider services={serviceMap}>
     <App />
-  </InjectorProvider>,
+  </DecouplerProvider>,
   document.getElementById('app')
 );
 ```
@@ -60,14 +58,14 @@ See example/ directory.
 
 ## API Reference
 
-### ServiceInjector
+### ServiceLocator
 
 A JavaScript Class that implements service registration and resolution.
 
 #### Public Methods
 
 ```
-class ServiceInjector
+class ServiceLocator
 
   static fromServices(services)
 
@@ -77,10 +75,10 @@ class ServiceInjector
 
 ```
 
-- `static fromServices(services: {})`: Factory function to create a ServiceInjector
+- `static fromServices(services: {})`: Factory function to create a ServiceLocator
   instance filled with the services from the provided vanilla JS object. Each
   key-value entry of the service object becomes a registered service in the
-  injector.
+  locator.
 
 - `register(key, service, options = {})`: Register a single service with a given
   key. Any value may be used as a key or a service. Supported options:
@@ -95,7 +93,7 @@ class ServiceInjector
     consistent between calls. Use in conjunction with the `Lookup` function
     if you want to bind to services in the Injector. Defaults to undefined.
 
-  - `asInstance: boolean`: When true, the injector will call `new` on the
+  - `asInstance: boolean`: When true, the locator will call `new` on the
     service value when resolving it. Will return a new instance _every call_.
     Defaults to false.
 
@@ -107,7 +105,7 @@ class ServiceInjector
 
 * `clearDependencyCache()`: Clears the resolution cache of all parameter bound
   services. When is this useful? If you are dynamically registering services
-  (e.g. calling `injector.register()` inside a component or function) and want
+  (e.g. calling `locator.register()` inside a component or function) and want
   to force all future resolutions to forget the previous value of that
   registered service key, call this method to delete the previously cached
   services. The drawback to calling this function is that it forces certain
@@ -133,23 +131,23 @@ class D {
   }
 }
 
-const injector = new ServiceInjector();
+const locator = new ServiceLocator();
 
-injector.register('A', A);
-injector.register('B', B, { asInstance: true });
-injector.register('C', cHelper, { withParams: [123, 'Hi: '] });
-injector.register('D', D, {
+locator.register('A', A);
+locator.register('B', B, { asInstance: true });
+locator.register('C', cHelper, { withParams: [123, 'Hi: '] });
+locator.register('D', D, {
   asInstance: true,
   withParams: [Lookup('A'), Lookup('B'), 123],
 });
 
 // Option 1: Array resolve
 
-const [KlassA, b, instanceC, d] = injector.resolve(['A', 'B', 'C', 'D']);
+const [KlassA, b, instanceC, d] = locator.resolve(['A', 'B', 'C', 'D']);
 
 // Option 2: Object resolve (equivalent)
 
-const { KlassA, b, instanceC, d } = injector.resolve({
+const { KlassA, b, instanceC, d } = locator.resolve({
   KlassA: 'A',
   b: 'B',
   instanceC: 'C',
@@ -159,8 +157,8 @@ const { KlassA, b, instanceC, d } = injector.resolve({
 
 ### Lookup()
 
-Utility used in conjunction with the `ServiceInjector.register` option
-`{withParams: []}` to indicate to the ServiceInjector it should look for a
+Utility used in conjunction with the `ServiceLocator.register` option
+`{withParams: []}` to indicate to the ServiceLocator it should look for a
 service with that key during resolution.
 
 #### Usage
@@ -176,15 +174,15 @@ class Bar {}
 // In "withParams", 'Bar' will be a string bound to first argument of foo and
 // Lookup('Bar') will be an instance of Bar class bound to the second argument
 
-injector.register('Foo', foo, { withParams: ['Bar', Lookup('Bar')] });
+locator.register('Foo', foo, { withParams: ['Bar', Lookup('Bar')] });
 
-injector.register('Bar', Bar, { isInstance: true });
+locator.register('Bar', Bar, { isInstance: true });
 
-const [resolvedFoo] = injector.resolve(['Foo']);
+const [resolvedFoo] = locator.resolve(['Foo']);
 resolvedFoo();
 ```
 
-### InjectorProvider
+### DecouplerProvider
 
 React Context Provider. Wrap your components with this provider to enable the
 rest of the helper functions and components.
@@ -193,7 +191,7 @@ rest of the helper functions and components.
 
 Supply one of the following props, but not both:
 
-- `injector`: an instance of ServiceInjector (or API compatible object)
+- `locator`: an instance of ServiceLocator (or API compatible object)
 - `services`: Vanilla JS object mapping service key names to services. e.g.
   `{ServiceKey: class MyService {}}`
 
@@ -202,15 +200,15 @@ Supply one of the following props, but not both:
 ```javascript
 class MyService {};
 
-const injector = new ServiceInjector();
+const locator = new ServiceLocator();
 
-injector.register('ServiceKey', MyService);
+locator.register('ServiceKey', MyService);
 
 function App() {
   return (
-    <InjectorProvider injector={injectorInstance}>
+    <DecouplerProvider locator={locatorInstance}>
       <YourApp />
-    </InjectorProvider
+    </DecouplerProvider
   )
 }
 ```
@@ -226,23 +224,23 @@ const servicesMap = {
 
 function App() {
   return (
-    <InjectorProvider services={servicesMap}>
+    <DecouplerProvider services={servicesMap}>
       <YourApp />
-    </InjectorProvider
+    </DecouplerProvider
   )
 }
 ```
 
-### useInjector()
+### useLocator()
 
-Hook to return the internal ServiceInjector instance from context.
+Hook to return the internal ServiceLocator instance from context.
 
 #### Usage
 
 ```javascript
 function App() {
-  const injector = useInjector();
-  const [A] = injector.resolve(['A']);
+  const locator = useLocator();
+  const [A] = locator.resolve(['A']);
   return <div />;
 }
 ```
@@ -266,20 +264,20 @@ function App() {
 }
 ```
 
-### InjectServices
+### LocateServices
 
-Render Prop component for injecting services.
+React Component for locating services and passing to a children render prop.
 
 #### Usage
 
 ```javascript
 function App() {
   return (
-    <InjectServices deps={['funcKey', 'ServiceClass', 'val']}>
+    <LocateServices deps={['funcKey', 'ServiceClass', 'val']}>
       {([func, ServiceClas, val]) => {
         return <div />;
       }}
-    </InjectServices>
+    </LocateServices>
   );
 }
 ```
