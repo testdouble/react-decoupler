@@ -23,7 +23,19 @@ const DecouplerContext = React.createContext();
  *       <YourApp />
  *     </DecouplerProvider
  */
-export function DecouplerProvider({ services, locator, value, children }) {
+export function DecouplerProvider({
+  services,
+  locator,
+  injector, // TODO: For backwards compat. Remove this before 1.0.
+  value,
+  children,
+}) {
+  if (injector) {
+    console.warn(
+      'DecouplerProvider "injector" prop is deprecated. Use "locator".'
+    );
+    locator = injector;
+  }
   if (!services && !locator) {
     throw new Error(
       'Must provide services or locator prop to DecouplerProvider.'
@@ -39,6 +51,8 @@ export function DecouplerProvider({ services, locator, value, children }) {
     </DecouplerContext.Provider>
   );
 }
+// TODO: For backwards compat. Remove this before 1.0.
+export const InjectorProvider = DecouplerProvider;
 
 /**
  * @name: withServices

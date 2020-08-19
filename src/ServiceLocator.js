@@ -118,3 +118,6 @@ export class ServiceLocator {
     return [];
   };
 }
+
+// TODO: For backwards compat. Remove this before 1.0.
+export const ServiceInjector = ServiceLocator;
