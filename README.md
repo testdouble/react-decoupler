@@ -52,6 +52,45 @@ ReactDOM.render(
 );
 ```
 
+#### Alternate Example
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { DecouplerProvider, ServiceLocator, useServices } from 'react-decoupler';
+import apiClient from './myApiClient';
+
+const locator = new ServiceLocator();
+locator.register('apiClient', apiClient);
+
+function App() {
+  const [apiClient] = useServices(['apiClient']);
+  const [loading, setLoading] = React.useState(false);
+  const [data, setData] = React.useState([])
+
+  React.useEffect(() => {
+    apiClient.loadData().then(setData).finally(() => setLoading(false))
+  }, [apiClient]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      {/* do stuff with data*/}
+    </div>
+  );
+}
+
+ReactDOM.render(
+  <DecouplerProvider locator={locator}>
+    <App />
+  </DecouplerProvider>,
+  document.getElementById('app')
+);
+```
+
 #### Big Example
 
 See example/ directory.
@@ -66,13 +105,10 @@ A JavaScript Class that implements service registration and resolution.
 
 ```
 class ServiceLocator
-
   static fromServices(services)
-
   register(key, service, options)
   resolve(dependencies)
   clearDependencyCache()
-
 ```
 
 - `static fromServices(services: {})`: Factory function to create a ServiceLocator
@@ -200,9 +236,9 @@ Supply one of the following props, but not both:
 ```javascript
 class MyService {};
 
-const locator = new ServiceLocator();
+const locatorInstance = new ServiceLocator();
 
-locator.register('ServiceKey', MyService);
+locatorInstance.register('ServiceKey', MyService);
 
 function App() {
   return (
