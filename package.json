@@ -1,6 +1,6 @@
 {
   "name": "react-decoupler",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0",
   "author": "Tommy Groshong <tom@groshong.software> (https://tommygroshong.com)",
   "description": "Simple Dependency Injection for React",
   "license": "MIT",
