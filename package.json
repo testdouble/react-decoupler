@@ -6,7 +6,9 @@
   "license": "MIT",
   "keywords": [
     "react",
-    "dependency injection"
+    "dependency injection",
+    "service locator",
+    "decouple"
   ],
   "main": "index.js",
   "module": "dist/react-decoupler.mjs",
