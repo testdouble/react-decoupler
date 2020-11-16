@@ -15,6 +15,19 @@ describe('ServiceLocator', () => {
     expect(locator.resolve(['A.super-complex-key', 'B'])).toEqual([A, B]);
   });
 
+  it('maintains static data when rebinding', () => {
+    class A {
+      static thing() {
+        return true;
+      }
+    }
+
+    locator.register('A', A, { withParams: [1] });
+    const [AResolved] = locator.resolve(['A']);
+
+    expect(AResolved.thing()).toBe(true);
+  });
+
   it('register supports strings, funcs, numbers, and symbols as keys', () => {
     class Foo {}
     class Bar {}

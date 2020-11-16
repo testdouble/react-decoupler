@@ -87,7 +87,8 @@ export class ServiceLocator {
     if (options.withParams) {
       if (!this._boundLookups.has(key)) {
         const args = this._makeDepArgs(options);
-        this._boundLookups.set(key, service.bind(null, ...args));
+        const boundFn = bindArgsAndMaintainStatics(service, args);
+        this._boundLookups.set(key, boundFn);
       }
 
       const boundService = this._boundLookups.get(key);
@@ -117,6 +118,20 @@ export class ServiceLocator {
     }
     return [];
   };
+}
+
+function bindArgsAndMaintainStatics(service, args) {
+  const boundObj = service.bind(null, ...args);
+  Object.getOwnPropertyNames(service)
+    .filter(n => n !== 'prototype')
+    .forEach(name => {
+      const descriptor = Object.getOwnPropertyDescriptor(boundObj, name);
+      if (descriptor && !descriptor.writable) {
+        return;
+      }
+      boundObj[name] = service[name];
+    });
+  return boundObj;
 }
 
 // TODO: For backwards compat. Remove this before 1.0.
